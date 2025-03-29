@@ -43,10 +43,10 @@ create table users(
 
 create table first_sign_in(
     sign_in_id uuid constraint pk_first_sign_in primary key constraint def_first_sign_in_uuid default gen_random_uuid(),
-    user uuid not null,
+    auth_user uuid not null,
     is_first boolean not null,
-    constraint fk_user_first_sign_in foreign key (user) references users(user_id)
-)
+    constraint fk_user_first_sign_in foreign key (auth_user) references users(user_id)
+);
 
 create table courses(
     course_id uuid constraint pk_course primary key constraint def_course_uuid default gen_random_uuid(),
@@ -81,7 +81,7 @@ create table blocks_materials(
     bm_date_create timestamptz not null constraint def_bm_created default current_timestamp,
     note text,
     block int not null,
-    constraint fk_bm_blocks foreign key (block) references courses_blocks(block_id)
+    constraint fk_bm_blocks foreign key (block) references courses_blocks(block_id),
     material uuid not null,
     constraint fk_bm_materials foreign key (material) references materials(material_id)
 );
@@ -94,17 +94,16 @@ create table blocks_tasks(
     link_for_save_progress text,
     block int not null,
     constraint fk_bm_blocks foreign key (block) references courses_blocks(block_id)
-    material uuid not null
 );
 
 create table users_tasks(
     ut_id uuid constraint pk_ut primary key constraint def_ut_uuid default gen_random_uuid(),
-    user uuid not null,
+    auth_user uuid not null,
     task uuid not null,
     status int not null,
     date_start timestamptz not null,
     duration int not null,
-    constraint fk_users_tasks_user foreign key (user) references users(user_id),
+    constraint fk_users_tasks_user foreign key (auth_user) references users(user_id),
     constraint fk_users_tasks_task foreign key (task) references blocks_tasks(task_id),
-    constraint fk_users_tasks_status foreign key (status) references study_states(state_id),
+    constraint fk_users_tasks_status foreign key (status) references study_states(state_id)
 );

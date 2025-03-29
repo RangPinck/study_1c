@@ -1,12 +1,9 @@
 FROM postgres:17.4
 
-# Копируем дамп базы данных
 COPY study_1C_db_dump.sql /docker-entrypoint-initdb.d/
 
-# Устанавливаем переменные окружения
 ENV POSTGRES_USER=admin
 ENV POSTGRES_PASSWORD=123456
 ENV POSTGRES_DB=study_1C_db
 
-# указываем порт обращения
 EXPOSE 5432

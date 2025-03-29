@@ -1,5 +1,3 @@
-\connect study_1С_db
-
 --
 -- PostgreSQL database dump
 --
