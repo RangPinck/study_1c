@@ -38,14 +38,8 @@ create table users(
     user_patronymic text,
     user_data_create timestamptz not null constraint def_user_created default current_timestamp,
     user_role int not null,
+    is_first boolean not null constraint def_user_is_first default true,
     constraint fk_user_role foreign key (user_role) references roles(role_id)
-);
-
-create table first_sign_in(
-    sign_in_id uuid constraint pk_first_sign_in primary key constraint def_first_sign_in_uuid default gen_random_uuid(),
-    auth_user uuid not null,
-    is_first boolean not null,
-    constraint fk_user_first_sign_in foreign key (auth_user) references users(user_id)
 );
 
 create table courses(
@@ -81,29 +75,42 @@ create table blocks_materials(
     bm_date_create timestamptz not null constraint def_bm_created default current_timestamp,
     note text,
     block int not null,
-    constraint fk_bm_blocks foreign key (block) references courses_blocks(block_id),
     material uuid not null,
+    constraint fk_bm_blocks foreign key (block) references courses_blocks(block_id),
     constraint fk_bm_materials foreign key (material) references materials(material_id)
 );
 
 create table blocks_tasks(
-    task_id uuid constraint pk_task primary key constraint def_task_uuid default gen_random_uuid(),
+    task_id serial constraint pk_task primary key,
     task_name text not null,
     task_date_created timestamptz not null constraint def_task_created default current_timestamp,
     duration int not null,
-    link_for_save_progress text,
+    link text,
     block int not null,
     constraint fk_bm_blocks foreign key (block) references courses_blocks(block_id)
+);
+
+create table tasks_practice (
+    practice_id uuid constraint pk_practice primary key constraint def_practice_uuid default gen_random_uuid(),
+    practice_name text not null,
+    practice_date_created timestamptz not null constraint def_practice_created default current_timestamp,
+    duration int not null,
+    link text,
+    task int not null,
+    constraint fk_practice_task foreign key (task) references blocks_tasks(task_id)
 );
 
 create table users_tasks(
     ut_id uuid constraint pk_ut primary key constraint def_ut_uuid default gen_random_uuid(),
     auth_user uuid not null,
-    task uuid not null,
+    task int not null,
+    practice uuid not null,
     status int not null,
     date_start timestamptz not null,
-    duration int not null,
+    duration_task int not null,
+    duration_practice int not null,
     constraint fk_users_tasks_user foreign key (auth_user) references users(user_id),
     constraint fk_users_tasks_task foreign key (task) references blocks_tasks(task_id),
+    constraint fk_users_tasks_practice foreign key (practice) references tasks_practice(practice_id),
     constraint fk_users_tasks_status foreign key (status) references study_states(state_id)
 );

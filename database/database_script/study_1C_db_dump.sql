@@ -1,5 +1,3 @@
-\connect study_1С_db
-
 --
 -- PostgreSQL database dump
 --
@@ -47,7 +45,7 @@ CREATE TABLE public.blocks_tasks (
     task_name text NOT NULL,
     task_date_created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     duration integer NOT NULL,
-    link_for_save_progress text,
+    link text,
     block integer NOT NULL
 );
 
@@ -106,19 +104,6 @@ ALTER SEQUENCE public.courses_blocks_block_id_seq OWNER TO admin;
 
 ALTER SEQUENCE public.courses_blocks_block_id_seq OWNED BY public.courses_blocks.block_id;
 
-
---
--- Name: first_sign_in; Type: TABLE; Schema: public; Owner: admin
---
-
-CREATE TABLE public.first_sign_in (
-    sign_in_id uuid DEFAULT gen_random_uuid() NOT NULL,
-    auth_user uuid NOT NULL,
-    is_first boolean NOT NULL
-);
-
-
-ALTER TABLE public.first_sign_in OWNER TO admin;
 
 --
 -- Name: material_type; Type: TABLE; Schema: public; Owner: admin
@@ -238,6 +223,22 @@ ALTER SEQUENCE public.study_states_state_id_seq OWNED BY public.study_states.sta
 
 
 --
+-- Name: tasks_practice; Type: TABLE; Schema: public; Owner: admin
+--
+
+CREATE TABLE public.tasks_practice (
+    practice_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    practice_name text NOT NULL,
+    practice_date_created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    duration integer NOT NULL,
+    link text,
+    task uuid NOT NULL
+);
+
+
+ALTER TABLE public.tasks_practice OWNER TO admin;
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: admin
 --
 
@@ -249,7 +250,8 @@ CREATE TABLE public.users (
     user_name text NOT NULL,
     user_patronymic text,
     user_data_create timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    user_role integer NOT NULL
+    user_role integer NOT NULL,
+    is_first boolean DEFAULT true NOT NULL
 );
 
 
@@ -263,9 +265,11 @@ CREATE TABLE public.users_tasks (
     ut_id uuid DEFAULT gen_random_uuid() NOT NULL,
     auth_user uuid NOT NULL,
     task uuid NOT NULL,
+    practice uuid NOT NULL,
     status integer NOT NULL,
     date_start timestamp with time zone NOT NULL,
-    duration integer NOT NULL
+    duration_task integer NOT NULL,
+    duration_practice integer NOT NULL
 );
 
 
@@ -311,7 +315,7 @@ COPY public.blocks_materials (bm_id, bm_date_create, note, block, material) FROM
 -- Data for Name: blocks_tasks; Type: TABLE DATA; Schema: public; Owner: admin
 --
 
-COPY public.blocks_tasks (task_id, task_name, task_date_created, duration, link_for_save_progress, block) FROM stdin;
+COPY public.blocks_tasks (task_id, task_name, task_date_created, duration, link, block) FROM stdin;
 \.
 
 
@@ -328,14 +332,6 @@ COPY public.courses (course_id, course_name, course_data_create, description, li
 --
 
 COPY public.courses_blocks (block_id, block_name, block_date_created, description, course) FROM stdin;
-\.
-
-
---
--- Data for Name: first_sign_in; Type: TABLE DATA; Schema: public; Owner: admin
---
-
-COPY public.first_sign_in (sign_in_id, auth_user, is_first) FROM stdin;
 \.
 
 
@@ -372,10 +368,18 @@ COPY public.study_states (state_id, state_name) FROM stdin;
 
 
 --
+-- Data for Name: tasks_practice; Type: TABLE DATA; Schema: public; Owner: admin
+--
+
+COPY public.tasks_practice (practice_id, practice_name, practice_date_created, duration, link, task) FROM stdin;
+\.
+
+
+--
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: admin
 --
 
-COPY public.users (user_id, user_login, user_hash_password, user_surname, user_name, user_patronymic, user_data_create, user_role) FROM stdin;
+COPY public.users (user_id, user_login, user_hash_password, user_surname, user_name, user_patronymic, user_data_create, user_role, is_first) FROM stdin;
 \.
 
 
@@ -383,7 +387,7 @@ COPY public.users (user_id, user_login, user_hash_password, user_surname, user_n
 -- Data for Name: users_tasks; Type: TABLE DATA; Schema: public; Owner: admin
 --
 
-COPY public.users_tasks (ut_id, auth_user, task, status, date_start, duration) FROM stdin;
+COPY public.users_tasks (ut_id, auth_user, task, practice, status, date_start, duration_task, duration_practice) FROM stdin;
 \.
 
 
@@ -440,14 +444,6 @@ ALTER TABLE ONLY public.courses
 
 
 --
--- Name: first_sign_in pk_first_sign_in; Type: CONSTRAINT; Schema: public; Owner: admin
---
-
-ALTER TABLE ONLY public.first_sign_in
-    ADD CONSTRAINT pk_first_sign_in PRIMARY KEY (sign_in_id);
-
-
---
 -- Name: materials pk_material; Type: CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -461,6 +457,14 @@ ALTER TABLE ONLY public.materials
 
 ALTER TABLE ONLY public.material_type
     ADD CONSTRAINT pk_material_type PRIMARY KEY (type_id);
+
+
+--
+-- Name: tasks_practice pk_practice; Type: CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY public.tasks_practice
+    ADD CONSTRAINT pk_practice PRIMARY KEY (practice_id);
 
 
 --
@@ -544,6 +548,14 @@ ALTER TABLE ONLY public.materials
 
 
 --
+-- Name: tasks_practice fk_practice_task; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY public.tasks_practice
+    ADD CONSTRAINT fk_practice_task FOREIGN KEY (task) REFERENCES public.blocks_tasks(task_id);
+
+
+--
 -- Name: courses fk_user_course; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
@@ -552,19 +564,19 @@ ALTER TABLE ONLY public.courses
 
 
 --
--- Name: first_sign_in fk_user_first_sign_in; Type: FK CONSTRAINT; Schema: public; Owner: admin
---
-
-ALTER TABLE ONLY public.first_sign_in
-    ADD CONSTRAINT fk_user_first_sign_in FOREIGN KEY (auth_user) REFERENCES public.users(user_id);
-
-
---
 -- Name: users fk_user_role; Type: FK CONSTRAINT; Schema: public; Owner: admin
 --
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT fk_user_role FOREIGN KEY (user_role) REFERENCES public.roles(role_id);
+
+
+--
+-- Name: users_tasks fk_users_tasks_practice; Type: FK CONSTRAINT; Schema: public; Owner: admin
+--
+
+ALTER TABLE ONLY public.users_tasks
+    ADD CONSTRAINT fk_users_tasks_practice FOREIGN KEY (practice) REFERENCES public.tasks_practice(practice_id);
 
 
 --
