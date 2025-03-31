@@ -39,7 +39,7 @@ create table users(
     user_data_create timestamptz not null constraint def_user_created default current_timestamp,
     user_role int not null,
     is_first boolean not null constraint def_user_is_first default true,
-    constraint fk_user_role foreign key (user_role) references roles(role_id)
+    constraint fk_user_role foreign key (user_role) references roles(role_id) on delete cascade
 );
 
 create table courses(
@@ -49,7 +49,7 @@ create table courses(
     description text,
     link text,
     author uuid not null,
-    constraint fk_user_course foreign key (author) references users(user_id)
+    constraint fk_user_course foreign key (author) references users(user_id) on delete cascade
 );
 
 create table courses_blocks(
@@ -58,8 +58,8 @@ create table courses_blocks(
     block_date_created timestamptz not null constraint def_block_created default current_timestamp,
     course uuid not null,
     description text,
-    block_number_of_course int,
-    constraint fk_courses_blocks foreign key (course) references courses(course_id)
+    block_number_of_course int, 
+    constraint fk_courses_blocks foreign key (course) references courses(course_id) on delete cascade
 );
 
 create table materials(
@@ -69,7 +69,7 @@ create table materials(
     link text,
     type int not null,
     description text,
-    constraint fk_materials_types foreign key (type) references material_type(type_id)
+    constraint fk_materials_types foreign key (type) references material_type(type_id) on delete cascade
 );
 
 create table blocks_materials(
@@ -79,8 +79,8 @@ create table blocks_materials(
     bm_date_create timestamptz not null constraint def_bm_created default current_timestamp,
     note text,
     duration int,
-    constraint fk_bm_blocks foreign key (block) references courses_blocks(block_id),
-    constraint fk_bm_materials foreign key (material) references materials(material_id)
+    constraint fk_bm_blocks foreign key (block) references courses_blocks(block_id) on delete cascade,
+    constraint fk_bm_materials foreign key (material) references materials(material_id) on delete cascade
 );
 
 create table blocks_tasks(
@@ -92,7 +92,7 @@ create table blocks_tasks(
     link text,
     task_number_of_block int not null,
     description text,
-    constraint fk_bm_blocks foreign key (block) references courses_blocks(block_id)
+    constraint fk_bm_blocks foreign key (block) references courses_blocks(block_id) on delete cascade
 );
 
 create table tasks_practice (
@@ -101,9 +101,9 @@ create table tasks_practice (
     practice_date_created timestamptz not null constraint def_practice_created default current_timestamp,
     duration int not null,
     link text,
-    task int not null,
+    task uuid not null,
     number_practice_of_task int,
-    constraint fk_practice_task foreign key (task) references blocks_tasks(task_id)
+    constraint fk_practice_task foreign key (task) references blocks_tasks(task_id) on delete cascade
 );
 
 create table users_tasks(
@@ -117,9 +117,9 @@ create table users_tasks(
     duration_task int not null,
     duration_practice int not null,
     duration_material int not null,
-    constraint fk_users_tasks_user foreign key (auth_user) references users(user_id),
-    constraint fk_users_tasks_task foreign key (task) references blocks_tasks(task_id),
-    constraint fk_users_tasks_material foreign key (material) references blocks_materials(bm_id),
-    constraint fk_users_tasks_practice foreign key (practice) references tasks_practice(practice_id),
-    constraint fk_users_tasks_status foreign key (status) references study_states(state_id)
+    constraint fk_users_tasks_user foreign key (auth_user) references users(user_id) on delete cascade,
+    constraint fk_users_tasks_task foreign key (task) references blocks_tasks(task_id) on delete cascade,
+    constraint fk_users_tasks_material foreign key (material) references blocks_materials(bm_id) on delete cascade,
+    constraint fk_users_tasks_practice foreign key (practice) references tasks_practice(practice_id) on delete cascade,
+    constraint fk_users_tasks_status foreign key (status) references study_states(state_id) on delete cascade
 );
