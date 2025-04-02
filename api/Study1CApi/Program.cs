@@ -13,6 +13,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
         builder.Services.AddDbContext<Study1cDbContext>(options =>
         {

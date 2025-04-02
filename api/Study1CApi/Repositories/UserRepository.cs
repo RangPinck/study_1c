@@ -1,7 +1,8 @@
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
-using Study1CApi.DTOs;
+using Study1CApi.DTOs.UserDTOs;
 using Microsoft.EntityFrameworkCore;
+using Study1CApi.DTOs.RoleDTOs;
 
 namespace Study1CApi.Repositories
 {
@@ -30,6 +31,11 @@ namespace Study1CApi.Repositories
             }).ToListAsync();
 
             return users;
+        }
+
+        public async Task UpdateUser()
+        {
+
         }
     }
 }

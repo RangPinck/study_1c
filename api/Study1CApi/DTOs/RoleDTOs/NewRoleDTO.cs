@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Study1CApi.DTOs
+namespace Study1CApi.DTOs.RoleDTOs
 {
-    public class RoleDTO
+    public class NewRoleDTO
     {
-        public int RoleId { get; set; }
-
         public string RoleName { get; set; } = null!;
     }
 }
