@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Study1CApi.DTOs.RoleDTOs;
 using Study1CApi.Interfaces;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Study1CApi.Controllers
 {
@@ -23,6 +24,7 @@ namespace Study1CApi.Controllers
             _roleRepository = roleRepository;
         }
 
+        [SwaggerOperation(Summary = "Получение всех ролей")]
         [HttpGet("GetAllRoles")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<RoleDTO>))]
         [ProducesResponseType(400)]
@@ -38,6 +40,7 @@ namespace Study1CApi.Controllers
             return Ok(roles);
         }
 
+        [SwaggerOperation(Summary = "Получение роли по id")]
         [HttpGet("GetRoleById")]
         [ProducesResponseType(200, Type = typeof(RoleDTO))]
         [ProducesResponseType(400)]
@@ -58,6 +61,7 @@ namespace Study1CApi.Controllers
             return Ok(roles);
         }
 
+        [SwaggerOperation(Summary = "Добавление роли")]
         [HttpPost("AddRole")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -82,6 +86,7 @@ namespace Study1CApi.Controllers
             return Ok("Operation success");
         }
 
+        [SwaggerOperation(Summary = "Обновление роли")]
         [HttpPut("UpdateRole")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
@@ -116,6 +121,7 @@ namespace Study1CApi.Controllers
             return Ok("Operation success");
         }
 
+        [SwaggerOperation(Summary = "Удаление роли")]
         [HttpDelete("DeleteRole")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]

@@ -14,6 +14,7 @@ public class Program
 
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+        builder.Services.AddScoped<IConnectionRepository, ConnectionRepository>();
 
         builder.Services.AddDbContext<Study1cDbContext>(options =>
         {
@@ -33,6 +34,7 @@ public class Program
                 Version = "v1",
                 Description = "API for 1C training applications.",
             });
+            swagger.EnableAnnotations();
         });
 
         var app = builder.Build();
