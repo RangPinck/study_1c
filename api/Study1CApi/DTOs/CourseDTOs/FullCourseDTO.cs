@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Study1CApi.DTOs.UserDTOs
+namespace Study1CApi.DTOs.CourseDTOs
 {
-    public class UpdateFullUserDTOs
+    public class FullCourseDTO
     {
         
     }

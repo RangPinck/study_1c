@@ -28,122 +28,162 @@ namespace Study1CApi.Controllers
         [HttpGet("GetAllRoles")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<RoleDTO>))]
         [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> GetAllRoles()
         {
-            var roles = await _roleRepository.GetAllRoles();
-
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest();
-            }
+                var roles = await _roleRepository.GetAllRoles();
 
-            return Ok(roles);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(roles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
         }
 
         [SwaggerOperation(Summary = "Получение роли по id")]
         [HttpGet("GetRoleById")]
         [ProducesResponseType(200, Type = typeof(RoleDTO))]
         [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> GetRoleById(int roleId)
         {
-            if (!await _roleRepository.RoleIsExistOfId(roleId))
+            try
             {
-                return BadRequest("This role cannot exist.");
+                if (!await _roleRepository.RoleIsExistOfId(roleId))
+                {
+                    return BadRequest("This role cannot exist.");
+                }
+
+                var roles = await _roleRepository.GetRoleById(roleId);
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(roles);
             }
-
-            var roles = await _roleRepository.GetRoleById(roleId);
-
-            if (!ModelState.IsValid)
+            catch (Exception ex)
             {
-                return BadRequest();
+                return StatusCode(503, ex.Message);
             }
-
-            return Ok(roles);
         }
 
         [SwaggerOperation(Summary = "Добавление роли")]
         [HttpPost("AddRole")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> AddBook(string newRoleName)
         {
-            if (await _roleRepository.RoleIsExistOfName(newRoleName))
+            try
             {
-                return BadRequest("This role already exist.");
-            }
+                if (await _roleRepository.RoleIsExistOfName(newRoleName))
+                {
+                    return BadRequest("This role already exist.");
+                }
 
-            if (string.IsNullOrEmpty(newRoleName))
+                if (string.IsNullOrEmpty(newRoleName))
+                {
+                    return BadRequest("A role cannot exist without title.");
+                }
+
+                if (!await _roleRepository.AddRole(new NewRoleDTO() { RoleName = newRoleName }))
+                {
+                    ModelState.AddModelError("", "This role doesn't add to database. No correct data.");
+                    return StatusCode(400, ModelState);
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
             {
-                return BadRequest("A role cannot exist without title.");
+                return StatusCode(503, ex.Message);
             }
-
-            if (!await _roleRepository.AddRole(new NewRoleDTO() { RoleName = newRoleName }))
-            {
-                ModelState.AddModelError("", "This role doesn't add to database. No correct data.");
-                return StatusCode(400, ModelState);
-            }
-
-            return Ok("Operation success");
         }
 
         [SwaggerOperation(Summary = "Обновление роли")]
         [HttpPut("UpdateRole")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> UpdateRole(int roleId, string roleName)
         {
-            if (nonManipulatedRoles.Any(x => x.RoleId == roleId && x.RoleName != roleName))
+            try
             {
-                return BadRequest("it is forbidden to change this role!");
-            }
+                if (nonManipulatedRoles.Any(x => x.RoleId == roleId && x.RoleName != roleName))
+                {
+                    return BadRequest("it is forbidden to change this role!");
+                }
 
-            if (!await _roleRepository.RoleIsExistOfId(roleId))
+                if (!await _roleRepository.RoleIsExistOfId(roleId))
+                {
+                    return BadRequest("This role cannot exist.");
+                }
+
+                if (await _roleRepository.RoleIsExistOfName(roleName))
+                {
+                    return BadRequest("Role with currant name already exist.");
+                }
+
+                if (string.IsNullOrEmpty(roleName))
+                {
+                    return BadRequest("A role cannot exist without title.");
+                }
+
+                if (!await _roleRepository.UpdateRole(new RoleDTO() { RoleId = roleId, RoleName = roleName }))
+                {
+                    ModelState.AddModelError("", "This role doesn't update. No correct data.");
+                    return StatusCode(400, ModelState);
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
             {
-                return BadRequest("This role cannot exist.");
+                return StatusCode(503, ex.Message);
             }
-
-            if (await _roleRepository.RoleIsExistOfName(roleName))
-            {
-                return BadRequest("Role with currant name already exist.");
-            }
-
-            if (string.IsNullOrEmpty(roleName))
-            {
-                return BadRequest("A role cannot exist without title.");
-            }
-
-            if (!await _roleRepository.UpdateRole(new RoleDTO() { RoleId = roleId, RoleName = roleName }))
-            {
-                ModelState.AddModelError("", "This role doesn't update. No correct data.");
-                return StatusCode(400, ModelState);
-            }
-
-            return Ok("Operation success");
         }
 
         [SwaggerOperation(Summary = "Удаление роли")]
         [HttpDelete("DeleteRole")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> DeleteRole(int roleId)
         {
-            if (!await _roleRepository.RoleIsExistOfId(roleId))
+            try
             {
-                return BadRequest("This role cannot exist.");
-            }
+                if (!await _roleRepository.RoleIsExistOfId(roleId))
+                {
+                    return BadRequest("This role cannot exist.");
+                }
 
-            if (nonManipulatedRoles.Any(x => x.RoleId == roleId))
+                if (nonManipulatedRoles.Any(x => x.RoleId == roleId))
+                {
+                    return BadRequest("It is forbidden to delete this role!");
+                }
+
+                if (!await _roleRepository.DeleteRole(roleId))
+                {
+                    ModelState.AddModelError("", "This role doesn't delete. No correct data.");
+                    return StatusCode(400, ModelState);
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
             {
-                return BadRequest("It is forbidden to delete this role!");
+                return StatusCode(503, ex.Message);
             }
-
-            if (!await _roleRepository.DeleteRole(roleId))
-            {
-                ModelState.AddModelError("", "This role doesn't delete. No correct data.");
-                return StatusCode(400, ModelState);
-            }
-
-            return Ok("Operation success");
         }
     }
 }
