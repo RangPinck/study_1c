@@ -4,7 +4,7 @@
 
 -- Dumped from database version 17.4 (Debian 17.4-1.pgdg120+2)
 -- Dumped by pg_dump version 17.4 (Debian 17.4-1.pgdg120+2)
-
+\connect study_1С_db
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
