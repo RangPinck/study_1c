@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Study1CApi.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;

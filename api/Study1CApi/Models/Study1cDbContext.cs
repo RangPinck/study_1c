@@ -15,6 +15,8 @@ public partial class Study1cDbContext : DbContext
     {
     }
 
+    public virtual DbSet<AuthUser> AuthUsers { get; set; }
+
     public virtual DbSet<BlocksMaterial> BlocksMaterials { get; set; }
 
     public virtual DbSet<BlocksTask> BlocksTasks { get; set; }
@@ -67,6 +69,12 @@ public partial class Study1cDbContext : DbContext
             entity.HasOne(d => d.MaterialNavigation).WithMany(p => p.BlocksMaterials)
                 .HasForeignKey(d => d.Material)
                 .HasConstraintName("fk_bm_materials");
+        });
+
+        modelBuilder.Entity<AuthUser>(entity =>
+        {
+            entity.HasKey(e => e.UserId);
+            entity.
         });
 
         modelBuilder.Entity<BlocksTask>(entity =>
