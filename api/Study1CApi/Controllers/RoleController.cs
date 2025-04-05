@@ -24,8 +24,7 @@ namespace Study1CApi.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<RoleDTO>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-
-        [AllowAnonymous]
+        [Authorize(Roles = "Администратор")]
         public async Task<IActionResult> GetAllRoles()
         {
             try
@@ -54,8 +53,7 @@ namespace Study1CApi.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-
-        [AllowAnonymous]
+        [Authorize(Roles = "Администратор")]
         public async Task<IActionResult> AddRole(string newRoleName)
         {
             try
@@ -102,8 +100,7 @@ namespace Study1CApi.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-
-        [AllowAnonymous]
+        [Authorize(Roles = "Администратор")]
         public async Task<IActionResult> UpdateRole(Guid roleId, string roleName)
         {
             try
@@ -159,8 +156,7 @@ namespace Study1CApi.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-
-        [AllowAnonymous]
+        [Authorize(Roles = "Администратор")]
         public async Task<IActionResult> DeleteRole(Guid roleId)
         {
             try
