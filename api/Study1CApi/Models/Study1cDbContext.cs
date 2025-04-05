@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Study1CApi.Models;
 
-public partial class Study1cDbContext : DbContext
+public partial class Study1cDbContext : IdentityDbContext<AuthUser, AuthRole, Guid>
 {
     public Study1cDbContext()
     {
@@ -15,7 +17,7 @@ public partial class Study1cDbContext : DbContext
     {
     }
 
-    public virtual DbSet<AuthUser> AuthUsers { get; set; }
+    //public virtual DbSet<AuthUser> AuthUsers { get; set; }
 
     public virtual DbSet<BlocksMaterial> BlocksMaterials { get; set; }
 
@@ -45,6 +47,13 @@ public partial class Study1cDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<AuthUser>(entity =>
+        {
+            entity.HasOne(it => it.UserNavigation).WithOne(it => it.AuthUserNavigation).HasForeignKey<User>(it => it.UserId).OnDelete(DeleteBehavior.Cascade).IsRequired();
+        });
+
         modelBuilder.Entity<BlocksMaterial>(entity =>
         {
             entity.HasKey(e => e.BmId).HasName("pk_blocks_materials");
@@ -69,12 +78,6 @@ public partial class Study1cDbContext : DbContext
             entity.HasOne(d => d.MaterialNavigation).WithMany(p => p.BlocksMaterials)
                 .HasForeignKey(d => d.Material)
                 .HasConstraintName("fk_bm_materials");
-        });
-
-        modelBuilder.Entity<AuthUser>(entity =>
-        {
-            entity.HasKey(e => e.UserId);
-            entity.
         });
 
         modelBuilder.Entity<BlocksTask>(entity =>
@@ -226,6 +229,8 @@ public partial class Study1cDbContext : DbContext
 
             entity.ToTable("users");
 
+            //entity.HasOne(it => it.AuthUserNavigation).WithOne(it => it.UserNavigation).OnDelete(DeleteBehavior.Cascade).HasForeignKey<AuthUser>(x => x.Id);
+
             entity.Property(e => e.UserId)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("user_id");
@@ -290,8 +295,35 @@ public partial class Study1cDbContext : DbContext
                 .HasConstraintName("fk_users_tasks_task");
         });
 
-        OnModelCreatingPartial(modelBuilder);
-    }
+        modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("AspNetUserClaims", t => t.ExcludeFromMigrations());
+        modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("AspNetRoleClaims", t => t.ExcludeFromMigrations());
+        modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("AspNetUserLogins", t => t.ExcludeFromMigrations());
+        modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("AspNetUserTokens", t => t.ExcludeFromMigrations());
 
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+        //Заполняем роли
+        modelBuilder.Entity<AuthRole>().HasData(new List<AuthRole>
+        {
+            new AuthRole
+            {
+                Id = new Guid("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
+                Name = "Ученик",
+                NormalizedName = "УЧЕНИК",
+                ConcurrencyStamp = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+            },
+            new AuthRole
+            {
+                Id = new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"),
+                Name = "Куратор",
+                NormalizedName = "КУРАТОР",
+                ConcurrencyStamp = "c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"
+            },
+            new AuthRole
+            {
+                Id = new Guid("f45d2396-3e72-4ec7-b892-7bd454248158"),
+                Name = "Администратор",
+                NormalizedName = "АДМНИСТРАТОР",
+                ConcurrencyStamp = "f45d2396-3e72-4ec7-b892-7bd454248158"
+            },
+        });
+    }
 }
