@@ -1,11 +1,9 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -68,27 +66,26 @@ public class Program
 
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
-        builder.Services.AddScoped<IRoleRepository, RoleRepository>();
         builder.Services.AddScoped<IConnectionRepository, ConnectionRepository>();
 
-        builder.Services.AddIdentity<AuthUser, AuthRole>(options =>
+        builder.Services.AddIdentity<AuthUser, Role>(options =>
         {
-            options.Password.RequiredLength = 8;
+            options.Password.RequiredLength = 6;
             options.Password.RequireDigit = false;
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequireUppercase = false;
             options.Password.RequireLowercase = false;
             options.User.RequireUniqueEmail = true;
         })
-    .AddRoles<AuthRole>()
-    .AddEntityFrameworkStores<Study1cDbContext>()
-    .AddDefaultTokenProviders();
+        .AddRoles<Role>()
+        .AddEntityFrameworkStores<Study1cDbContext>()
+        .AddDefaultTokenProviders();
 
         var validIssuer = builder.Configuration.GetValue<string>("JWT:Issuer");
         var validAudience = builder.Configuration.GetValue<string>("JWT:Audience");
         var symmetricSecurityKey = builder.Configuration.GetValue<string>("JWT:SigningKey");
 
-        builder.Services.AddAuthentication(options =>  // схема аутентификации - с помощью jwt-токенов
+        builder.Services.AddAuthentication(options =>  
         {
             options.DefaultAuthenticateScheme =
             options.DefaultChallengeScheme =
@@ -96,7 +93,7 @@ public class Program
             options.DefaultForbidScheme =
             options.DefaultSignInScheme =
             options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options => // подключение аутентификации с помощью jwt-токенов;
+        }).AddJwtBearer(options => 
         {
             options.RequireHttpsMetadata = false;
             options.SaveToken = true;
@@ -111,14 +108,13 @@ public class Program
                 ValidAudience = validAudience,
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])
+                    Encoding.UTF8.GetBytes(symmetricSecurityKey)
                 )
             };
-            options.Events = new JwtBearerEvents //Для создания кастомного сообщения о том, что пользователь не авторизован
+            options.Events = new JwtBearerEvents
             {
                 OnChallenge = async context =>
                 {
-                    // Call this to skip the default logic and avoid using the default response
                     context.HandleResponse();
 
                     var httpContext = context.HttpContext;
@@ -140,7 +136,7 @@ public class Program
             options.FallbackPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build();
-        }); //для того, чтобы для каждого запроса нужна была атворизация
+        });
 
         var app = builder.Build();
 

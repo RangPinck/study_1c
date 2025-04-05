@@ -18,7 +18,6 @@ namespace Study1CApi.Repositories
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:SigningKey"]));
         }
 
-        //Создание токена
         public string CreateToken(AuthUser user, string role)
         {
             var claims = new List<Claim>

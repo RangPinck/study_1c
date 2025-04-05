@@ -14,20 +14,13 @@ namespace Study1CApi.Repositories
 
         public async Task<ICollection<UserDTO>> GetAllUsers()
         {
-            var users = await _context.Users.Include(x => x.UserRoleNavigation).Select(x => new UserDTO()
+            var users = await _context.Users.Select(x => new UserDTO()
             {
                 UserId = x.UserId,
-                UserLogin = x.UserLogin,
                 UserSurname = x.UserSurname,
                 UserName = x.UserName,
                 UserPatronymic = x.UserPatronymic,
-                UserDataCreate = x.UserDataCreate,
-                IsFirst = x.IsFirst,
-                UserRole = new RoleDTO()
-                {
-                    RoleId = x.UserRoleNavigation.RoleId,
-                    RoleName = x.UserRoleNavigation.RoleName
-                }
+                IsFirst = x.IsFirst
             }).ToListAsync();
 
             return users;

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Study1CApi.DTOs.RoleDTOs;
 
 namespace Study1CApi.DTOs.UserDTOs
@@ -19,8 +15,6 @@ namespace Study1CApi.DTOs.UserDTOs
         public string UserName { get; set; } = null!;
 
         public string? UserPatronymic { get; set; }
-
-        public DateTime UserDataCreate { get; set; }
 
         public RoleDTO UserRole { get; set; } = new RoleDTO();
 
