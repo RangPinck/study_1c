@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Study1CApi.Models;
 
-public partial class Study1cDbContext : IdentityDbContext<AuthUser, AuthRole, Guid>
+public partial class Study1cDbContext : IdentityDbContext<AuthUser, Role, Guid>
 {
     public Study1cDbContext()
     {
@@ -16,8 +14,6 @@ public partial class Study1cDbContext : IdentityDbContext<AuthUser, AuthRole, Gu
         : base(options)
     {
     }
-
-    //public virtual DbSet<AuthUser> AuthUsers { get; set; }
 
     public virtual DbSet<BlocksMaterial> BlocksMaterials { get; set; }
 
@@ -42,8 +38,7 @@ public partial class Study1cDbContext : IdentityDbContext<AuthUser, AuthRole, Gu
     public virtual DbSet<UsersTask> UsersTasks { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Username=admin;Password=123456;Database=study_1C_db;Pooling=true;SearchPath=test;");
+        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Username=admin;Password=123456;Database=study_1C_db;Pooling=true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -180,16 +175,6 @@ public partial class Study1cDbContext : IdentityDbContext<AuthUser, AuthRole, Gu
             entity.Property(e => e.TypeName).HasColumnName("type_name");
         });
 
-        modelBuilder.Entity<Role>(entity =>
-        {
-            entity.HasKey(e => e.RoleId).HasName("pk_role");
-
-            entity.ToTable("roles");
-
-            entity.Property(e => e.RoleId).HasColumnName("role_id");
-            entity.Property(e => e.RoleName).HasColumnName("role_name");
-        });
-
         modelBuilder.Entity<StudyState>(entity =>
         {
             entity.HasKey(e => e.StateId).HasName("pk_state_type");
@@ -229,27 +214,15 @@ public partial class Study1cDbContext : IdentityDbContext<AuthUser, AuthRole, Gu
 
             entity.ToTable("users");
 
-            //entity.HasOne(it => it.AuthUserNavigation).WithOne(it => it.UserNavigation).OnDelete(DeleteBehavior.Cascade).HasForeignKey<AuthUser>(x => x.Id);
-
             entity.Property(e => e.UserId)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("user_id");
             entity.Property(e => e.IsFirst)
                 .HasDefaultValue(true)
                 .HasColumnName("is_first");
-            entity.Property(e => e.UserDataCreate)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnName("user_data_create");
-            entity.Property(e => e.UserHashPassword).HasColumnName("user_hash_password");
-            entity.Property(e => e.UserLogin).HasColumnName("user_login");
             entity.Property(e => e.UserName).HasColumnName("user_name");
             entity.Property(e => e.UserPatronymic).HasColumnName("user_patronymic");
-            entity.Property(e => e.UserRole).HasColumnName("user_role");
             entity.Property(e => e.UserSurname).HasColumnName("user_surname");
-
-            entity.HasOne(d => d.UserRoleNavigation).WithMany(p => p.Users)
-                .HasForeignKey(d => d.UserRole)
-                .HasConstraintName("fk_user_role");
         });
 
         modelBuilder.Entity<UsersTask>(entity =>
@@ -293,37 +266,39 @@ public partial class Study1cDbContext : IdentityDbContext<AuthUser, AuthRole, Gu
                 .HasForeignKey(d => d.Task)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_users_tasks_task");
-        });
 
-        modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("AspNetUserClaims", t => t.ExcludeFromMigrations());
-        modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("AspNetRoleClaims", t => t.ExcludeFromMigrations());
-        modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("AspNetUserLogins", t => t.ExcludeFromMigrations());
-        modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("AspNetUserTokens", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("AspNetUserClaims", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("AspNetRoleClaims", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("AspNetUserLogins", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("AspNetUserTokens", t => t.ExcludeFromMigrations());
 
-        //Заполняем роли
-        modelBuilder.Entity<AuthRole>().HasData(new List<AuthRole>
+            modelBuilder.Entity<Role>().HasData(new List<Role>
         {
-            new AuthRole
+            new Role
             {
                 Id = new Guid("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
                 Name = "Ученик",
                 NormalizedName = "УЧЕНИК",
-                ConcurrencyStamp = "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                ConcurrencyStamp = "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                IsNoManipulate = true
             },
-            new AuthRole
+            new Role
             {
                 Id = new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"),
                 Name = "Куратор",
                 NormalizedName = "КУРАТОР",
-                ConcurrencyStamp = "c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"
+                ConcurrencyStamp = "c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e",
+                IsNoManipulate= true
             },
-            new AuthRole
+            new Role
             {
                 Id = new Guid("f45d2396-3e72-4ec7-b892-7bd454248158"),
                 Name = "Администратор",
                 NormalizedName = "АДМНИСТРАТОР",
-                ConcurrencyStamp = "f45d2396-3e72-4ec7-b892-7bd454248158"
+                ConcurrencyStamp = "f45d2396-3e72-4ec7-b892-7bd454248158",
+                IsNoManipulate  = true
             },
+        });
         });
     }
 }

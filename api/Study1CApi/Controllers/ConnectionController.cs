@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Study1CApi.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
@@ -19,6 +20,7 @@ namespace Study1CApi.Controllers
         [HttpGet("CheckConnection")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
+        [AllowAnonymous]
         public async Task<IActionResult> CheckConnection()
         {
             var connection = await _connectionRepository.CheckConnectionAsync();

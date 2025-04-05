@@ -28,9 +28,12 @@ namespace Study1CApi.Controllers
             _context = context;
         }
 
-        [SwaggerOperation(Summary = "Регистрация в системе")]
+        [SwaggerOperation(Summary = "Создание пользователя")]
         [HttpPost("Register")]
         [AllowAnonymous]
+        [ProducesResponseType(200, Type = typeof(User))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
         public async Task<IActionResult> Register([FromBody] RegisterDTO registerDto)
         {
             try
@@ -43,21 +46,19 @@ namespace Study1CApi.Controllers
 
                 var appUser = new AuthUser
                 {
-                    //Username должен быть уникальным, поэтому передаём сюда email
                     Email = registerDto.Email.ToLower(),
-                    UserName = registerDto.Email.ToLower()
+                    UserName = registerDto.Email.ToLower(),
+                    EmailConfirmed = true
                 };
 
-                //Создается пользователь и возвращается в переменную 
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
 
                 if (createdUser.Succeeded)
                 {
-                    //Добавление роли Teacher
                     var roleResult = await _userManager.AddToRoleAsync(appUser, "Ученик");
+
                     if (roleResult.Succeeded)
                     {
-                        //Получаем объект пользователя по его Email (который уникальный кстати)
                         var user = await _userManager.FindByEmailAsync(registerDto.Email.ToLower());
 
                         if (user != null)
@@ -68,17 +69,18 @@ namespace Study1CApi.Controllers
                                 IsFirst = registerDto.IsFirst,
                                 UserName = registerDto.UserName,
                                 UserSurname = registerDto.UserSurname,
+                                UserPatronymic = registerDto.UserPatronymic,
                                 AuthUserNavigation = appUser
                             };
 
                             _context.Users.Add(newUser);
                             _context.SaveChanges();
-                            
+
                             return Ok(newUser);
                         }
-                        else return StatusCode(500, "Ошибка создания пользователя");
+                        else return StatusCode(400, "Ошибка создания пользователя");
                     }
-                    else return StatusCode(500, roleResult.Errors.FirstOrDefault().Description);
+                    else return StatusCode(400, roleResult.Errors.FirstOrDefault().Description);
                 }
                 else
                 {
@@ -86,14 +88,13 @@ namespace Study1CApi.Controllers
                     if (error != null)
                         if (error.Code == "DuplicateUserName")
                             return BadRequest("Такой пользователь уже есть");
-                    return StatusCode(500, error);
+                    return StatusCode(400, error.Description);
                 }
             }
             catch (Exception e)
             {
-                return StatusCode(500, e);
+                return StatusCode(500, e.Message);
             }
         }
-
     }
 }

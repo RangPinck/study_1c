@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Study1CApi.DTOs.RoleDTOs;
-using Study1CApi.Interfaces;
+using Study1CApi.Models;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Study1CApi.Controllers
@@ -13,15 +12,11 @@ namespace Study1CApi.Controllers
     [Route("api/[controller]")]
     public class RoleController : ControllerBase
     {
-        private readonly IRoleRepository _roleRepository;
-        private ICollection<RoleDTO> nonManipulatedRoles = new List<RoleDTO>(){
-            new RoleDTO(){ RoleId = 1, RoleName = "Ученик"},
-            new RoleDTO(){ RoleId = 2, RoleName = "Куратор"},
-            new RoleDTO(){ RoleId = 3, RoleName = "Администратор"}
-        };
-        public RoleController(IRoleRepository roleRepository)
+        private readonly RoleManager<Role> _roleManager;
+
+        public RoleController(RoleManager<Role> roleManager)
         {
-            _roleRepository = roleRepository;
+            _roleManager = roleManager;
         }
 
         [SwaggerOperation(Summary = "Получение всех ролей")]
@@ -29,40 +24,17 @@ namespace Study1CApi.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<RoleDTO>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
+
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllRoles()
         {
             try
             {
-                var roles = await _roleRepository.GetAllRoles();
-
-                if (!ModelState.IsValid)
+                var roles = await _roleManager.Roles.Select(role => new RoleDTO()
                 {
-                    return BadRequest();
-                }
-
-                return Ok(roles);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(503, ex.Message);
-            }
-        }
-
-        [SwaggerOperation(Summary = "Получение роли по id")]
-        [HttpGet("GetRoleById")]
-        [ProducesResponseType(200, Type = typeof(RoleDTO))]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> GetRoleById(int roleId)
-        {
-            try
-            {
-                if (!await _roleRepository.RoleIsExistOfId(roleId))
-                {
-                    return BadRequest("This role cannot exist.");
-                }
-
-                var roles = await _roleRepository.GetRoleById(roleId);
+                    RoleId = role.Id,
+                    RoleName = role.Name
+                }).ToListAsync();
 
                 if (!ModelState.IsValid)
                 {
@@ -82,11 +54,13 @@ namespace Study1CApi.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> AddBook(string newRoleName)
+
+        [AllowAnonymous]
+        public async Task<IActionResult> AddRole(string newRoleName)
         {
             try
             {
-                if (await _roleRepository.RoleIsExistOfName(newRoleName))
+                if (await _roleManager.RoleExistsAsync(newRoleName))
                 {
                     return BadRequest("This role already exist.");
                 }
@@ -96,10 +70,23 @@ namespace Study1CApi.Controllers
                     return BadRequest("A role cannot exist without title.");
                 }
 
-                if (!await _roleRepository.AddRole(new NewRoleDTO() { RoleName = newRoleName }))
+                var roleWasCreated = await _roleManager.CreateAsync(new Role()
                 {
-                    ModelState.AddModelError("", "This role doesn't add to database. No correct data.");
-                    return StatusCode(400, ModelState);
+                    Id = Guid.NewGuid(),
+                    Name = newRoleName,
+                    NormalizedName = newRoleName.ToUpper(),
+                    ConcurrencyStamp = DateTime.Now.ToString(),
+                    IsNoManipulate = false
+                });
+
+                if (!roleWasCreated.Succeeded)
+                {
+                    return BadRequest($"This role doesn't add to database. No correct data.\n{roleWasCreated.Errors.FirstOrDefault().Description}");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
                 }
 
                 return Ok("Operation success");
@@ -115,21 +102,18 @@ namespace Study1CApi.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> UpdateRole(int roleId, string roleName)
+
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateRole(Guid roleId, string roleName)
         {
             try
             {
-                if (nonManipulatedRoles.Any(x => x.RoleId == roleId && x.RoleName != roleName))
-                {
-                    return BadRequest("it is forbidden to change this role!");
-                }
-
-                if (!await _roleRepository.RoleIsExistOfId(roleId))
+                if (await _roleManager.FindByIdAsync(roleId.ToString()) is null)
                 {
                     return BadRequest("This role cannot exist.");
                 }
 
-                if (await _roleRepository.RoleIsExistOfName(roleName))
+                if (await _roleManager.FindByNameAsync(roleName) != null)
                 {
                     return BadRequest("Role with currant name already exist.");
                 }
@@ -139,10 +123,27 @@ namespace Study1CApi.Controllers
                     return BadRequest("A role cannot exist without title.");
                 }
 
-                if (!await _roleRepository.UpdateRole(new RoleDTO() { RoleId = roleId, RoleName = roleName }))
+                var updateRole = await _roleManager.FindByIdAsync(roleId.ToString());
+
+                if (updateRole.IsNoManipulate)
                 {
-                    ModelState.AddModelError("", "This role doesn't update. No correct data.");
-                    return StatusCode(400, ModelState);
+                    return BadRequest("it is forbidden to change this role!");
+                }
+
+                updateRole.Name = roleName;
+                updateRole.NormalizedName = roleName.ToUpper();
+                updateRole.ConcurrencyStamp = DateTime.Now.ToString();
+
+                var updateRoleResult = await _roleManager.UpdateAsync(updateRole);
+
+                if (!updateRoleResult.Succeeded)
+                {
+                    return BadRequest($"This role doesn't update. No correct data.\n{updateRoleResult.Errors.FirstOrDefault().Description}");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
                 }
 
                 return Ok("Operation success");
@@ -158,24 +159,35 @@ namespace Study1CApi.Controllers
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteRole(int roleId)
+
+        [AllowAnonymous]
+        public async Task<IActionResult> DeleteRole(Guid roleId)
         {
             try
             {
-                if (!await _roleRepository.RoleIsExistOfId(roleId))
+                var deleteRole = await _roleManager.FindByIdAsync(roleId.ToString());
+
+                if (deleteRole is null)
                 {
                     return BadRequest("This role cannot exist.");
                 }
 
-                if (nonManipulatedRoles.Any(x => x.RoleId == roleId))
-                {
-                    return BadRequest("It is forbidden to delete this role!");
-                }
-
-                if (!await _roleRepository.DeleteRole(roleId))
+                if (deleteRole.IsNoManipulate)
                 {
                     ModelState.AddModelError("", "This role doesn't delete. No correct data.");
                     return StatusCode(400, ModelState);
+                }
+
+                var isDeleteRole = await _roleManager.DeleteAsync(deleteRole);
+
+                if (!isDeleteRole.Succeeded)
+                {
+                    return BadRequest($"This role doesn't delete. No correct data.\n{isDeleteRole.Errors.FirstOrDefault().Description}");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
                 }
 
                 return Ok("Operation success");
