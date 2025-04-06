@@ -16,7 +16,7 @@ namespace Study1CApi;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +67,7 @@ public class Program
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IConnectionRepository, ConnectionRepository>();
+        builder.Services.AddTransient<IStartupFilter, DbStartupFilter>();
 
         builder.Services.AddIdentity<AuthUser, Role>(options =>
         {
@@ -85,7 +86,7 @@ public class Program
         var validAudience = builder.Configuration.GetValue<string>("JWT:Audience");
         var symmetricSecurityKey = builder.Configuration.GetValue<string>("JWT:SigningKey");
 
-        builder.Services.AddAuthentication(options =>  
+        builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme =
             options.DefaultChallengeScheme =
@@ -93,7 +94,7 @@ public class Program
             options.DefaultForbidScheme =
             options.DefaultSignInScheme =
             options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options => 
+        }).AddJwtBearer(options =>
         {
             options.RequireHttpsMetadata = false;
             options.SaveToken = true;
@@ -139,6 +140,23 @@ public class Program
         });
 
         var app = builder.Build();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var service = scope.ServiceProvider;
+
+            try
+            {
+                var userManager = service.GetRequiredService<UserManager<AuthUser>>();
+                var roleManager = service.GetRequiredService<RoleManager<Role>>();
+                var context = service.GetRequiredService<Study1cDbContext>();
+                await DefaultUserInitializer.UserInitializeAsync(userManager, roleManager, context);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
 
         if (app.Environment.IsDevelopment())
         {

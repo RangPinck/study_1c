@@ -273,33 +273,7 @@ public partial class Study1cDbContext : IdentityDbContext<AuthUser, Role, Guid>
             modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("AspNetUserLogins", t => t.ExcludeFromMigrations());
             modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("AspNetUserTokens", t => t.ExcludeFromMigrations());
 
-            modelBuilder.Entity<Role>().HasData(new List<Role>
-        {
-            new Role
-            {
-                Id = new Guid("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
-                Name = "Ученик",
-                NormalizedName = "УЧЕНИК",
-                ConcurrencyStamp = "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-                IsNoManipulate = true
-            },
-            new Role
-            {
-                Id = new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"),
-                Name = "Куратор",
-                NormalizedName = "КУРАТОР",
-                ConcurrencyStamp = "c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e",
-                IsNoManipulate= true
-            },
-            new Role
-            {
-                Id = new Guid("f45d2396-3e72-4ec7-b892-7bd454248158"),
-                Name = "Администратор",
-                NormalizedName = "АДМНИСТРАТОР",
-                ConcurrencyStamp = "f45d2396-3e72-4ec7-b892-7bd454248158",
-                IsNoManipulate  = true
-            },
-        });
+            //modelBuilder.Entity<Role>().HasData();
         });
     }
 }

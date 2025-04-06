@@ -454,32 +454,6 @@ namespace Study1CApi.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("f47ac10b-58cc-4372-a567-0e02b2c3d479"),
-                            ConcurrencyStamp = "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-                            IsNoManipulate = true,
-                            Name = "Ученик",
-                            NormalizedName = "УЧЕНИК"
-                        },
-                        new
-                        {
-                            Id = new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"),
-                            ConcurrencyStamp = "c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e",
-                            IsNoManipulate = true,
-                            Name = "Куратор",
-                            NormalizedName = "КУРАТОР"
-                        },
-                        new
-                        {
-                            Id = new Guid("f45d2396-3e72-4ec7-b892-7bd454248158"),
-                            ConcurrencyStamp = "f45d2396-3e72-4ec7-b892-7bd454248158",
-                            IsNoManipulate = true,
-                            Name = "Администратор",
-                            NormalizedName = "АДМНИСТРАТОР"
-                        });
                 });
 
             modelBuilder.Entity("Study1CApi.Models.StudyState", b =>
