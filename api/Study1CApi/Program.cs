@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Study1CApi.Initializers;
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
 using Study1CApi.Repositories;
@@ -67,7 +68,6 @@ public class Program
         builder.Services.AddScoped<ITokenService, TokenService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IConnectionRepository, ConnectionRepository>();
-        builder.Services.AddTransient<IStartupFilter, DbStartupFilter>();
 
         builder.Services.AddIdentity<AuthUser, Role>(options =>
         {
@@ -147,10 +147,21 @@ public class Program
 
             try
             {
+                string adminName = builder.Configuration.GetValue<string>("StandartAdmin:Name");
+                string adminLogin = builder.Configuration.GetValue<string>("StandartAdmin:Login");
+                string adminPassword = builder.Configuration.GetValue<string>("StandartAdmin:Password");
+
                 var userManager = service.GetRequiredService<UserManager<AuthUser>>();
                 var roleManager = service.GetRequiredService<RoleManager<Role>>();
                 var context = service.GetRequiredService<Study1cDbContext>();
-                await DefaultUserInitializer.UserInitializeAsync(userManager, roleManager, context);
+
+                await DefaultUserInitializer.UserInitializeAsync(
+                    userManager: userManager,
+                    roleManager: roleManager,
+                    context: context,
+                    adminName: adminName,
+                    adminPassword: adminPassword,
+                    adminLogin: adminLogin);
             }
             catch (Exception ex)
             {

@@ -33,8 +33,8 @@ namespace Study1CApi.Controllers
 
         [SwaggerOperation(Summary = "Создание пользователя")]
         [HttpPost("Register")]
-        //[Authorize(Roles = "Администратор")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Администратор")]
+        [Authorize(Roles = "Куратор")]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -59,7 +59,14 @@ namespace Study1CApi.Controllers
 
                 if (createdUser.Succeeded)
                 {
-                    var roleResult = await _userManager.AddToRoleAsync(appUser, "Ученик");
+                    var role = await _roleManager.FindByIdAsync(registerDto.RoleId.ToString());
+
+                    if (role == null)
+                    {
+                        return BadRequest("Role doesn't exists");
+                    }
+
+                    var roleResult = await _userManager.AddToRoleAsync(appUser, role.Name);
 
                     if (roleResult.Succeeded)
                     {
@@ -82,9 +89,9 @@ namespace Study1CApi.Controllers
 
                             return Ok(newUser);
                         }
-                        else return StatusCode(400, "Ошибка создания пользователя");
+                        else return BadRequest("Ошибка создания пользователя");
                     }
-                    else return StatusCode(400, roleResult.Errors.FirstOrDefault().Description);
+                    else return BadRequest(roleResult.Errors.FirstOrDefault().Description);
                 }
                 else
                 {
@@ -92,7 +99,7 @@ namespace Study1CApi.Controllers
                     if (error != null)
                         if (error.Code == "DuplicateUserName")
                             return BadRequest("Такой пользователь уже есть");
-                    return StatusCode(400, error.Description);
+                    return BadRequest(error.Description);
                 }
             }
             catch (Exception e)
