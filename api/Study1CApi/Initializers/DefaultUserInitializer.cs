@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations.Design;
 using Study1CApi.Models;
 
-namespace Study1CApi
+namespace Study1CApi.Initializers
 {
     public class DefaultUserInitializer
     {
@@ -33,10 +35,21 @@ namespace Study1CApi
             }
         };
 
-        public static async Task UserInitializeAsync(UserManager<AuthUser> userManager, RoleManager<Role> roleManager, Study1cDbContext context)
+        public static async Task UserInitializeAsync(UserManager<AuthUser> userManager, RoleManager<Role> roleManager, Study1cDbContext context, string adminName, string adminLogin, string adminPassword)
         {
             try
             {
+                var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+
+                if (pendingMigrations.Any())
+                {
+                    await context.Database.MigrateAsync();
+                }
+                else
+                {
+                    throw new Exception("Migrations doesn't exists");
+                }
+
                 foreach (var item in _roles)
                 {
                     if (!await roleManager.RoleExistsAsync(item.Name))
@@ -45,15 +58,16 @@ namespace Study1CApi
                     }
                 }
 
-                if (await userManager.FindByEmailAsync("admin@admin.com") == null)
+                if (await userManager.FindByEmailAsync(adminLogin) == null)
                 {
+                    Guid adminGuid = Guid.NewGuid();
                     var admin = new AuthUser()
                     {
-                        Id = new Guid("3a8e4f1b-6c2d-45a7-bf89-12d34e56f789"),
-                        UserName = "admin",
-                        Email = "admin@admin.com",
-                        NormalizedUserName = "ADMIN",
-                        NormalizedEmail = "ADMIN@ADMIN.COM",
+                        Id = adminGuid,
+                        UserName = adminName,
+                        Email = adminLogin,
+                        NormalizedUserName = adminName.ToUpper(),
+                        NormalizedEmail = adminLogin.ToUpper(),
                         EmailConfirmed = true,
                         PasswordHash = new PasswordHasher<AuthUser>().HashPassword(null, "admin1cdbapi")
                     };
@@ -68,9 +82,9 @@ namespace Study1CApi
                         {
                             var adminUser = new User()
                             {
-                                UserId = new Guid("3a8e4f1b-6c2d-45a7-bf89-12d34e56f789"),
-                                UserName = "admin",
-                                UserSurname = "admin",
+                                UserId = adminGuid,
+                                UserName = adminName,
+                                UserSurname = adminName,
                                 IsFirst = false
                             };
 

@@ -12,7 +12,7 @@ using Study1CApi.Models;
 namespace Study1CApi.Migrations
 {
     [DbContext(typeof(Study1cDbContext))]
-    [Migration("20250406150225_Init")]
+    [Migration("20250406162249_Init")]
     partial class Init
     {
         /// <inheritdoc />
