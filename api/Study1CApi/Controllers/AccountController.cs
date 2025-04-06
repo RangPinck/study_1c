@@ -17,19 +17,23 @@ namespace Study1CApi.Controllers
         private readonly UserManager<AuthUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly SignInManager<AuthUser> _signInManager;
+        private readonly RoleManager<Role> _roleManager;
         private readonly Study1cDbContext _context;
 
+
         public AccountController(UserManager<AuthUser> userManager, ITokenService tokenService,
-            SignInManager<AuthUser> signInManager, Study1cDbContext context)
+            SignInManager<AuthUser> signInManager, RoleManager<Role> roleManager, Study1cDbContext context)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _context = context;
         }
 
         [SwaggerOperation(Summary = "Создание пользователя")]
         [HttpPost("Register")]
+        //[Authorize(Roles = "Администратор")]
         [AllowAnonymous]
         [ProducesResponseType(200, Type = typeof(User))]
         [ProducesResponseType(400)]
@@ -95,6 +99,40 @@ namespace Study1CApi.Controllers
             {
                 return StatusCode(500, e.Message);
             }
+        }
+
+
+        [SwaggerOperation(Summary = "Авторизация в системе")]
+        [HttpPost("Login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(LoginDTO loginDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var appUser = await _userManager.FindByEmailAsync(loginDto.Email.ToLower());
+
+            if (appUser == null) return Unauthorized("Такого пользователя нет в базе");
+
+            var result = await _signInManager.CheckPasswordSignInAsync(appUser, loginDto.Password, false);
+
+            if (!result.Succeeded) return Unauthorized("Неверный пароль");
+
+            var userRole = await _userManager.GetRolesAsync(appUser);
+
+            var user = _context.Users.FirstOrDefault(u => u.UserId == appUser.Id);
+
+            SignInDTO profile = new SignInDTO()
+            {
+                Email = loginDto.Email,
+                UserSurname = user.UserSurname,
+                UserName = user.UserName,
+                UserPatronymic = user.UserPatronymic,
+                IsFirst = user.IsFirst,
+                Token = _tokenService.CreateToken(appUser, userRole.First())
+            };
+
+            return Ok(profile);
         }
     }
 }

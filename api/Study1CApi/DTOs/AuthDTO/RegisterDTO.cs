@@ -37,5 +37,9 @@ namespace Study1CApi.DTOs.AuthDTO
         [Compare("Password", ErrorMessage = "Пароли не совпадают")]
         [DefaultValue("12345678")]
         public string ConfirmPassword { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Не указан повторяющийся пароль!")]
+        [Display(Name = "Id роли пользователя")]
+        public Guid RoleId { get; set; } = new Guid("f47ac10b-58cc-4372-a567-0e02b2c3d479");
     }
 }
