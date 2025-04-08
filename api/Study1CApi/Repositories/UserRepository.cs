@@ -48,7 +48,7 @@ namespace Study1CApi.Repositories
                         UserPatronymic = profiles.FirstOrDefault(x => x.UserId == user.Id).UserPatronymic,
                         UserDataCreate = user.UserDataCreate,
                         UserRole = _userManager.GetRolesAsync(user).Result.ToList(),
-                    }).Where(x => x.UserRole.Contains("Ó÷åíèê")).ToList();
+                    }).Where(x => x.UserRole.Contains("Ð£Ñ‡ÐµÐ½Ð¸Ðº")).ToList();
                 }
 
                 return result;

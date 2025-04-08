@@ -41,7 +41,7 @@ namespace Study1CApi.Controllers
         [ProducesResponseType(200, Type = typeof(UserDTO))]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> Register([FromBody] RegistartionDTO registerDto)
+        public async Task<IActionResult> Register([FromBody] RegistrationDTO registerDto)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace Study1CApi.Controllers
                                 UserSurname = registerDto.UserSurname,
                                 UserPatronymic = registerDto.UserPatronymic,
                                 UserDataCreate = user.UserDataCreate,
-                                IsFirst = ! (role.Name == "Куратор" || role.Name == "Администратор"),
+                                IsFirst = !(role.Name == "Куратор" || role.Name == "Администратор"),
                                 UserRole = new List<string> { role.Name }
                             };
 
@@ -169,7 +169,7 @@ namespace Study1CApi.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Удаление прользователя")]
+        [SwaggerOperation(Summary = "Удаление пользователя")]
         [HttpDelete("DeleteAccount")]
         [Authorize]
         [ProducesResponseType(200)]
@@ -201,7 +201,7 @@ namespace Study1CApi.Controllers
                 if (_userManager.GetUsersInRoleAsync("Администратор").Result.ToList().Count == 1 &&
                     _userManager.GetRolesAsync(appUser).Result.Any(x => x == "Администратор"))
                 {
-                    return BadRequest("Вы не можете удалить послежнего администратора!");
+                    return BadRequest("Вы не можете удалить последнего администратора!");
                 }
 
                 if (appUser == loginUser)
@@ -222,7 +222,7 @@ namespace Study1CApi.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Обновление профиля прользователя")]
+        [SwaggerOperation(Summary = "Обновление профиля пользователя")]
         [HttpPut("UpdateProfile")]
         [Authorize]
         [ProducesResponseType(200, Type = typeof(UserDTO))]
@@ -240,18 +240,18 @@ namespace Study1CApi.Controllers
                 if (appUser == null) return Unauthorized("Такого пользователя нет в базе!");
 
                 var httpUser = HttpContext.User;
-                var authtUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
-                var authUserRoles = _userManager.GetRolesAsync(authtUser).Result.ToList();
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
 
-                if (authtUser.Id == updateUser.UserId)
+                if (authUser.Id == updateUser.UserId)
                 {
                     await _account.UpdateUserProfile(updateUser);
-                    authtUser.Email = updateUser.Email;
-                    authtUser.NormalizedEmail = updateUser.Email.ToUpper();
-                    authtUser.UserName = updateUser.UserName + " " + updateUser.UserName + " " + updateUser.UserPatronymic;
-                    authtUser.NormalizedUserName = authtUser.UserName.ToUpper();
-                    authtUser.ConcurrencyStamp = DateTime.UtcNow.ToString();
-                    await _userManager.UpdateAsync(authtUser);
+                    authUser.Email = updateUser.Email;
+                    authUser.NormalizedEmail = updateUser.Email.ToUpper();
+                    authUser.UserName = updateUser.UserName + " " + updateUser.UserName + " " + updateUser.UserPatronymic;
+                    authUser.NormalizedUserName = authUser.UserName.ToUpper();
+                    authUser.ConcurrencyStamp = DateTime.UtcNow.ToString();
+                    await _userManager.UpdateAsync(authUser);
                 }
                 else
                 {
@@ -301,52 +301,44 @@ namespace Study1CApi.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Обновление пароля прользователя")]
+        [SwaggerOperation(Summary = "Обновление пароля пользователя")]
         [HttpPut("UpdatePasswordForProfile")]
         [Authorize]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> UpdatePasswordForProfile(DeleteAccountDTO deleteUser)
+        public async Task<IActionResult> UpdatePasswordForProfile(UpdatePasswordDTO updateDTO)
         {
             try
             {
-                //if (!ModelState.IsValid)
-                //    return BadRequest(ModelState);
+                if (!ModelState.IsValid) return BadRequest(ModelState);
 
-                //var loginUser = await _userManager.FindByIdAsync(deleteUser.UserId.ToString());
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+                var appUser = _userManager.FindByEmailAsync(updateDTO.Email).Result;
+                var appUserRoles = _userManager.GetRolesAsync(appUser).Result.ToList();
 
-                //if (loginUser == null) return Unauthorized("Пользователь не вошёл в систему!");
+                if (appUser == null) return BadRequest("Пользователя с данной почтой не существует!");
 
-                //var appUser = await _userManager.FindByIdAsync(deleteUser.UserIdWillBeDelete.ToString());
+                if (authUser.Email == updateDTO.Email || (authUserRoles.Contains("Администратор") && !appUserRoles.Contains("Администратор")))
+                {
+                    if (updateDTO.Password == updateDTO.ConfirmPassword)
+                    {
+                        var token = await _userManager.GeneratePasswordResetTokenAsync(appUser);
+                        await _userManager.ResetPasswordAsync(appUser, token, updateDTO.Password);
+                    }
+                    else
+                    {
+                        return BadRequest("Пароли не совпадают!");
+                    }
+                }
+                else
+                {
+                    return BadRequest("У вас не достаточно прав для изменения пароля данного пользователя!");
+                }
 
-                //if (appUser == null) return BadRequest("Такого пользователя нет в базе");
-
-                //var listLoginUserRoles = _userManager.GetRolesAsync(loginUser).Result.ToList();
-                //var listAppUserRoles = _userManager.GetRolesAsync(appUser).Result.ToList();
-
-                //if (listAppUserRoles.Any(x => x == "Администратор") && !listLoginUserRoles.Any(x => x == "Администратор"))
-                //{
-                //    return BadRequest("У вас не достаточно прав, чтобы удалить данного пользователя!");
-                //}
-
-                //if (_userManager.GetUsersInRoleAsync("Администратор").Result.ToList().Count == 1 &&
-                //    _userManager.GetRolesAsync(appUser).Result.Any(x => x == "Администратор"))
-                //{
-                //    return BadRequest("Вы не можете удалить послежнего администратора!");
-                //}
-
-                //if (appUser == loginUser)
-                //{
-                //    await _userManager.DeleteAsync(appUser);
-                //}
-
-                //if (listLoginUserRoles.Any(x => x == "Администратор"))
-                //{
-                //    await _userManager.DeleteAsync(appUser);
-                //}
-
-                return Ok();
+                return Ok("Пароль был обновлён!");
             }
             catch (Exception ex)
             {
@@ -354,7 +346,7 @@ namespace Study1CApi.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Обновление роли прользователя")]
+        [SwaggerOperation(Summary = "Обновление роли пользователя")]
         [HttpPut("UpdateRoleProfile")]
         [Authorize]
         [ProducesResponseType(200)]
@@ -386,7 +378,7 @@ namespace Study1CApi.Controllers
                 if (_userManager.GetUsersInRoleAsync("Администратор").Result.ToList().Count == 1 &&
                     _userManager.GetRolesAsync(appUser).Result.Any(x => x == "Администратор"))
                 {
-                    return BadRequest("Вы не можете удалить послежнего администратора!");
+                    return BadRequest("Вы не можете удалить последнего администратора!");
                 }
 
                 if (appUser == loginUser)
@@ -407,13 +399,13 @@ namespace Study1CApi.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Регистрация первого входа прользователя")]
-        [HttpPut("RegistrateUserFirstLogin")]
+        [SwaggerOperation(Summary = "Регистрация первого входа пользователя")]
+        [HttpPut("RegistrationUserFirstLogin")]
         [Authorize]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> RegistrateUserFirstLogin()
+        public async Task<IActionResult> RegistrationUserFirstLogin()
         {
             try
             {
@@ -421,13 +413,13 @@ namespace Study1CApi.Controllers
                     return BadRequest(ModelState);
 
                 var httpUser = HttpContext.User;
-                var authtUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
 
-                var appUser = await _userManager.FindByIdAsync(authtUser.Id.ToString());
+                var appUser = await _userManager.FindByIdAsync(authUser.Id.ToString());
 
                 if (appUser == null) return BadRequest("Такого пользователя нет в базе");
 
-                if (!await _account.RegistrateUserFirstLogin(appUser.Id))
+                if (!await _account.RegistrationUserFirstLogin(appUser.Id))
                 {
                     return BadRequest("Не корректные данные");
                 }

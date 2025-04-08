@@ -29,7 +29,7 @@ namespace Study1CApi.Repositories
             };
         }
 
-        public async Task<bool> RegistrateUserFirstLogin(Guid userId)
+        public async Task<bool> RegistrationUserFirstLogin(Guid userId)
         {
             var profile = await _context.Users.FirstAsync(x => x.UserId == userId);
 
@@ -37,10 +37,10 @@ namespace Study1CApi.Repositories
 
             _context.Users.Update(profile);
 
-            return await SaveChengesAsync();
+            return await SaveChangesAsync();
         }
 
-        public async Task<bool> SaveChengesAsync()
+        public async Task<bool> SaveChangesAsync()
         {
             var save = await _context.SaveChangesAsync();
             return save > 0;
@@ -57,7 +57,7 @@ namespace Study1CApi.Repositories
 
             _context.Users.Update(profile);
 
-            return await SaveChengesAsync();
+            return await SaveChangesAsync();
         }
     }
 }
