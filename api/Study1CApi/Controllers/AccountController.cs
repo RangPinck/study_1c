@@ -204,17 +204,14 @@ namespace Study1CApi.Controllers
                     return BadRequest("Вы не можете удалить последнего администратора!");
                 }
 
-                if (appUser == loginUser)
+                if (appUser == loginUser || listLoginUserRoles.Any(x => x == "Администратор"))
                 {
-                    await _userManager.DeleteAsync(appUser);
+                    var result = await _userManager.DeleteAsync(appUser);
+
+                    if (!result.Succeeded) return BadRequest("Операцию выполнить не удалось");
                 }
 
-                if (listLoginUserRoles.Any(x => x == "Администратор"))
-                {
-                    await _userManager.DeleteAsync(appUser);
-                }
-
-                return Ok();
+                return Ok("Пользователь был удалён!");
             }
             catch (Exception ex)
             {
@@ -245,13 +242,21 @@ namespace Study1CApi.Controllers
 
                 if (authUser.Id == updateUser.UserId)
                 {
-                    await _account.UpdateUserProfile(updateUser);
-                    authUser.Email = updateUser.Email;
-                    authUser.NormalizedEmail = updateUser.Email.ToUpper();
-                    authUser.UserName = updateUser.UserName + " " + updateUser.UserName + " " + updateUser.UserPatronymic;
-                    authUser.NormalizedUserName = authUser.UserName.ToUpper();
-                    authUser.ConcurrencyStamp = DateTime.UtcNow.ToString();
-                    await _userManager.UpdateAsync(authUser);
+                    if (await _account.UpdateUserProfile(updateUser))
+                    {
+                        authUser.Email = updateUser.Email;
+                        authUser.NormalizedEmail = updateUser.Email.ToUpper();
+                        authUser.UserName = updateUser.UserName + " " + updateUser.UserName + " " + updateUser.UserPatronymic;
+                        authUser.NormalizedUserName = authUser.UserName.ToUpper();
+                        authUser.ConcurrencyStamp = DateTime.UtcNow.ToString();
+                        var result = await _userManager.UpdateAsync(authUser);
+
+                        if (!result.Succeeded) return BadRequest("Не корректные данные!");
+                    }
+                    else
+                    {
+                        return BadRequest("Не корректные данные!");
+                    }
                 }
                 else
                 {
@@ -265,18 +270,20 @@ namespace Study1CApi.Controllers
                             return BadRequest("У вас не достаточно прав для изменения данного пользователя!");
                         }
 
-                        await _account.UpdateUserProfile(updateUser);
-                        userWillBeUpdate.Email = updateUser.Email;
-                        userWillBeUpdate.NormalizedEmail = updateUser.Email.ToUpper();
-                        userWillBeUpdate.UserName = updateUser.UserName + " " + updateUser.UserName + " " + updateUser.UserPatronymic;
-                        userWillBeUpdate.NormalizedUserName = userWillBeUpdate.UserName.ToUpper();
-                        userWillBeUpdate.ConcurrencyStamp = DateTime.UtcNow.ToString();
-                        await _userManager.UpdateAsync(userWillBeUpdate);
+                        if (await _account.UpdateUserProfile(updateUser))
+                        {
+                            userWillBeUpdate.Email = updateUser.Email;
+                            userWillBeUpdate.NormalizedEmail = updateUser.Email.ToUpper();
+                            userWillBeUpdate.UserName = updateUser.UserName + " " + updateUser.UserName + " " + updateUser.UserPatronymic;
+                            userWillBeUpdate.NormalizedUserName = userWillBeUpdate.UserName.ToUpper();
+                            userWillBeUpdate.ConcurrencyStamp = DateTime.UtcNow.ToString();
+                            var result = await _userManager.UpdateAsync(userWillBeUpdate);
+
+                            if (!result.Succeeded) return BadRequest("Не корректные данные!");
+                        }
+                        else return BadRequest("Не корректные данные!");
                     }
-                    else
-                    {
-                        return BadRequest("У вас не достаточно прав для изменения данного пользователя!");
-                    }
+                    else return BadRequest("У вас не достаточно прав для изменения данного пользователя!");
                 }
 
                 var userWasUpdate = await _userManager.FindByIdAsync(updateUser.UserId.ToString());
@@ -326,17 +333,13 @@ namespace Study1CApi.Controllers
                     if (updateDTO.Password == updateDTO.ConfirmPassword)
                     {
                         var token = await _userManager.GeneratePasswordResetTokenAsync(appUser);
-                        await _userManager.ResetPasswordAsync(appUser, token, updateDTO.Password);
+                        var result = await _userManager.ResetPasswordAsync(appUser, token, updateDTO.Password);
+
+                        if (!result.Succeeded) return BadRequest("пароль обновить не удалось!");
                     }
-                    else
-                    {
-                        return BadRequest("Пароли не совпадают!");
-                    }
+                    else return BadRequest("Пароли не совпадают!");
                 }
-                else
-                {
-                    return BadRequest("У вас не достаточно прав для изменения пароля данного пользователя!");
-                }
+                else return BadRequest("У вас не достаточно прав для изменения пароля данного пользователя!");
 
                 return Ok("Пароль был обновлён!");
             }
@@ -348,50 +351,37 @@ namespace Study1CApi.Controllers
 
         [SwaggerOperation(Summary = "Обновление роли пользователя")]
         [HttpPut("UpdateRoleProfile")]
-        [Authorize]
+        [Authorize(Roles = "Администратор")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public async Task<IActionResult> UpdateRoleProfile(DeleteAccountDTO deleteUser)
+        public async Task<IActionResult> UpdateRoleProfile(UpdateUserRoleDTO updateRole)
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
+                if (!ModelState.IsValid) return BadRequest(ModelState);
 
-                var loginUser = await _userManager.FindByIdAsync(deleteUser.UserId.ToString());
+                var appUser = await _userManager.FindByIdAsync(updateRole.UserId.ToString());
 
-                if (loginUser == null) return Unauthorized("Пользователь не вошёл в систему!");
+                if (appUser == null) return BadRequest("Пользователя с данным id в базе данных не существует");
 
-                var appUser = await _userManager.FindByIdAsync(deleteUser.UserIdWillBeDelete.ToString());
+                var userRole = await _roleManager.FindByIdAsync(updateRole.RoleId.ToString());
 
-                if (appUser == null) return BadRequest("Такого пользователя нет в базе");
+                if (userRole == null) return BadRequest("Роли с данным id в базе данных не существует");
 
-                var listLoginUserRoles = _userManager.GetRolesAsync(loginUser).Result.ToList();
-                var listAppUserRoles = _userManager.GetRolesAsync(appUser).Result.ToList();
+                var appUserRoles = await _userManager.GetRolesAsync(appUser);
 
-                if (listAppUserRoles.Any(x => x == "Администратор") && !listLoginUserRoles.Any(x => x == "Администратор"))
-                {
-                    return BadRequest("У вас не достаточно прав, чтобы удалить данного пользователя!");
-                }
+                if (appUserRoles.Contains("Администратор")) return BadRequest("У вас недостаточно прав для смены роли у данного пользователя!");
 
-                if (_userManager.GetUsersInRoleAsync("Администратор").Result.ToList().Count == 1 &&
-                    _userManager.GetRolesAsync(appUser).Result.Any(x => x == "Администратор"))
-                {
-                    return BadRequest("Вы не можете удалить последнего администратора!");
-                }
+                var result = await _userManager.RemoveFromRoleAsync(appUser, appUserRoles.FirstOrDefault());
 
-                if (appUser == loginUser)
-                {
-                    await _userManager.DeleteAsync(appUser);
-                }
+                if (!result.Succeeded) return BadRequest("Не удалось удалить старую роль пользователя!");
 
-                if (listLoginUserRoles.Any(x => x == "Администратор"))
-                {
-                    await _userManager.DeleteAsync(appUser);
-                }
+                result = await _userManager.AddToRoleAsync(appUser, userRole.Name);
 
-                return Ok();
+                if (!result.Succeeded) return BadRequest("Не удалось установить новую роль пользователю!");
+
+                return Ok("Роль была обновлена!");
             }
             catch (Exception ex)
             {
@@ -419,12 +409,9 @@ namespace Study1CApi.Controllers
 
                 if (appUser == null) return BadRequest("Такого пользователя нет в базе");
 
-                if (!await _account.RegistrationUserFirstLogin(appUser.Id))
-                {
-                    return BadRequest("Не корректные данные");
-                }
+                if (!await _account.RegistrationUserFirstLogin(appUser.Id)) return BadRequest("Не корректные данные");
 
-                return Ok();
+                return Ok("Пользователь отмечен, что входил в систему!");
             }
             catch (Exception ex)
             {

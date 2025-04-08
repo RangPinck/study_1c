@@ -10,14 +10,6 @@ namespace Study1CApi.DTOs.AccountDTOs
         [Display(Name = "Email")]
         public string Email { get; set; } = string.Empty;
 
-        // [Required(ErrorMessage = "Не указан пароль!")]
-        // [Display(Name = "Пароль")]
-        // [DataType(DataType.Password)]
-        // [StringLength(64, MinimumLength = 6, ErrorMessage = "Длина должна быть от 6 до 64 символов")]
-        // [DefaultValue("12345678")]
-        // public string Password { get; set; } = string.Empty;
-
-
         [Required(ErrorMessage = "Не указан пароль!")]
         [Display(Name = "Пароль")]
         [DataType(DataType.Password)]
