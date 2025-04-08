@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Study1CApi.Models;
 
-public partial class Study1cDbContext : DbContext
+public partial class Study1cDbContext : IdentityDbContext<AuthUser, Role, Guid>
 {
     public Study1cDbContext()
     {
@@ -29,6 +29,8 @@ public partial class Study1cDbContext : DbContext
 
     public virtual DbSet<Role> Roles { get; set; }
 
+    public virtual DbSet<UserCourse> UserCourses { get; set; }
+
     public virtual DbSet<StudyState> StudyStates { get; set; }
 
     public virtual DbSet<TasksPractice> TasksPractices { get; set; }
@@ -38,11 +40,36 @@ public partial class Study1cDbContext : DbContext
     public virtual DbSet<UsersTask> UsersTasks { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Port=5438;Username=admin;Password=123456;Database=study_1C_db");
+        => optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Username=admin;Password=123456;Database=study_1C_db;Pooling=true");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<AuthUser>(entity =>
+        {
+            entity.HasOne(it => it.UserNavigation).WithOne(it => it.AuthUserNavigation).HasForeignKey<User>(it => it.UserId).OnDelete(DeleteBehavior.Cascade).IsRequired();
+        });
+
+        modelBuilder.Entity<UserCourse>(entity =>
+        {
+            entity.HasKey(e => e.CuId).HasName("pk_users_courses");
+
+            entity.ToTable("users_courses");
+
+            entity.Property(e => e.CuId)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("cu_id");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.UserCourses)
+                .HasForeignKey(d => d.CourseId)
+                .HasConstraintName("fk_cu_courses");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserCourses)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("fk_cu_users");
+        });
+
         modelBuilder.Entity<BlocksMaterial>(entity =>
         {
             entity.HasKey(e => e.BmId).HasName("pk_blocks_materials");
@@ -169,16 +196,6 @@ public partial class Study1cDbContext : DbContext
             entity.Property(e => e.TypeName).HasColumnName("type_name");
         });
 
-        modelBuilder.Entity<Role>(entity =>
-        {
-            entity.HasKey(e => e.RoleId).HasName("pk_role");
-
-            entity.ToTable("roles");
-
-            entity.Property(e => e.RoleId).HasColumnName("role_id");
-            entity.Property(e => e.RoleName).HasColumnName("role_name");
-        });
-
         modelBuilder.Entity<StudyState>(entity =>
         {
             entity.HasKey(e => e.StateId).HasName("pk_state_type");
@@ -224,19 +241,9 @@ public partial class Study1cDbContext : DbContext
             entity.Property(e => e.IsFirst)
                 .HasDefaultValue(true)
                 .HasColumnName("is_first");
-            entity.Property(e => e.UserDataCreate)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnName("user_data_create");
-            entity.Property(e => e.UserHashPassword).HasColumnName("user_hash_password");
-            entity.Property(e => e.UserLogin).HasColumnName("user_login");
             entity.Property(e => e.UserName).HasColumnName("user_name");
             entity.Property(e => e.UserPatronymic).HasColumnName("user_patronymic");
-            entity.Property(e => e.UserRole).HasColumnName("user_role");
             entity.Property(e => e.UserSurname).HasColumnName("user_surname");
-
-            entity.HasOne(d => d.UserRoleNavigation).WithMany(p => p.Users)
-                .HasForeignKey(d => d.UserRole)
-                .HasConstraintName("fk_user_role");
         });
 
         modelBuilder.Entity<UsersTask>(entity =>
@@ -280,10 +287,13 @@ public partial class Study1cDbContext : DbContext
                 .HasForeignKey(d => d.Task)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_users_tasks_task");
+
+            modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("AspNetUserClaims", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("AspNetRoleClaims", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("AspNetUserLogins", t => t.ExcludeFromMigrations());
+            modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("AspNetUserTokens", t => t.ExcludeFromMigrations());
+
+            //modelBuilder.Entity<Role>().HasData();
         });
-
-        OnModelCreatingPartial(modelBuilder);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

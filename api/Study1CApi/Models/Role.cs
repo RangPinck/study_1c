@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Identity;
 
-namespace Study1CApi.Models;
-
-public partial class Role
+namespace Study1CApi.Models
 {
-    public int RoleId { get; set; }
+    public partial class Role : IdentityRole<Guid>
+    {
+        public Role() { }
 
-    public string RoleName { get; set; } = null!;
+        public bool IsNoManipulate { get; set; } = false;
 
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
+        public Role(string roleName) : this()
+        {
+            Name = roleName;
+        }
+    }
 }
