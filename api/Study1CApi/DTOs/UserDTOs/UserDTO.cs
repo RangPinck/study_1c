@@ -1,23 +1,21 @@
-using Study1CApi.DTOs.RoleDTOs;
-
 namespace Study1CApi.DTOs.UserDTOs
 {
     public class UserDTO
     {
         public Guid UserId { get; set; }
 
-        public string UserLogin { get; set; } = null!;
+        public string UserLogin { get; set; } = string.Empty;
 
-        public string UserHashPassword { get; set; } = null!;
+        public string UserSurname { get; set; } = string.Empty;
 
-        public string UserSurname { get; set; } = null!;
-
-        public string UserName { get; set; } = null!;
+        public string UserName { get; set; } = string.Empty;
 
         public string? UserPatronymic { get; set; }
 
-        public RoleDTO UserRole { get; set; } = new RoleDTO();
-
         public bool IsFirst { get; set; }
+
+        public List<string> UserRole { get; set; } = new List<string>();
+
+        public DateTime UserDataCreate { get; set; }
     }
 }

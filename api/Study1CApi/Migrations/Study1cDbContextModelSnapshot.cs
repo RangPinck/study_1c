@@ -186,6 +186,9 @@ namespace Study1CApi.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime>("UserDataCreate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
@@ -553,6 +556,30 @@ namespace Study1CApi.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("Study1CApi.Models.UserCourse", b =>
+                {
+                    b.Property<Guid>("CuId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("cu_id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("CuId")
+                        .HasName("pk_users_courses");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("users_courses", (string)null);
+                });
+
             modelBuilder.Entity("Study1CApi.Models.UsersTask", b =>
                 {
                     b.Property<Guid>("UtId")
@@ -756,6 +783,27 @@ namespace Study1CApi.Migrations
                     b.Navigation("AuthUserNavigation");
                 });
 
+            modelBuilder.Entity("Study1CApi.Models.UserCourse", b =>
+                {
+                    b.HasOne("Study1CApi.Models.Course", "Course")
+                        .WithMany("UserCourses")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_cu_courses");
+
+                    b.HasOne("Study1CApi.Models.User", "User")
+                        .WithMany("UserCourses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_cu_users");
+
+                    b.Navigation("Course");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Study1CApi.Models.UsersTask", b =>
                 {
                     b.HasOne("Study1CApi.Models.User", "AuthUserNavigation")
@@ -822,6 +870,8 @@ namespace Study1CApi.Migrations
             modelBuilder.Entity("Study1CApi.Models.Course", b =>
                 {
                     b.Navigation("CoursesBlocks");
+
+                    b.Navigation("UserCourses");
                 });
 
             modelBuilder.Entity("Study1CApi.Models.CoursesBlock", b =>
@@ -854,6 +904,8 @@ namespace Study1CApi.Migrations
             modelBuilder.Entity("Study1CApi.Models.User", b =>
                 {
                     b.Navigation("Courses");
+
+                    b.Navigation("UserCourses");
 
                     b.Navigation("UsersTasks");
                 });

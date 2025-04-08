@@ -1,23 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
-namespace Study1CApi.DTOs.AuthDTO
+namespace Study1CApi.DTOs.AccountDTOs
 {
-    public class RegisterDTO
+    public class UpdatePasswordDTO
     {
-        public bool IsFirst { get; set; }
-
-        [Required(ErrorMessage = "Не указана фамилия!")]
-        [Display(Name = "Surname")]
-        public string UserSurname { get; set; } = null!;
-
-        [Required(ErrorMessage = "Не указано имя!")]
-        [Display(Name = "Name")]
-        public string UserName { get; set; } = null!;
-
-        [Display(Name = "Patronymic")]
-        public string UserPatronymic { get; set; } = null!;
-
         [Required(ErrorMessage = "Не указана почта!")]
         [EmailAddress]
         [Display(Name = "Email")]
@@ -37,9 +24,5 @@ namespace Study1CApi.DTOs.AuthDTO
         [Compare("Password", ErrorMessage = "Пароли не совпадают")]
         [DefaultValue("12345678")]
         public string ConfirmPassword { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Не указан повторяющийся пароль!")]
-        [Display(Name = "Id роли пользователя")]
-        public Guid RoleId { get; set; } = new Guid("f47ac10b-58cc-4372-a567-0e02b2c3d479");
     }
 }
