@@ -14,7 +14,34 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-
-	<UserControl Content="{Binding PageContent}"></UserControl>
-
+	<SplitView  IsPaneOpen="{Binding IsPaneOpen}" OpenPaneLength="500" Background="White" PanePlacement="Right" PaneBackground="White" DisplayMode="CompactInline" CornerRadius="15">
+		<SplitView.Pane>
+			<Border Background="#374151">
+				<StackPanel Orientation="Vertical" 
+                  Spacing="15"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Top">
+					<Button Width="40" HorizontalAlignment="Right" Margin="0,0,4,0" Background="Gray" Command="{Binding PaneState}">
+						<Path Data="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" Fill="Black"/>
+						<!-- Hamburger Icon (SVG Path) -->
+					</Button>
+					<Button  Width="40" HorizontalAlignment="Right" Margin="0,20,4,0" Background="Gray" Command="{Binding ToCourses}">
+						<Path Data="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" Fill="Black"/>
+					</Button>
+					<Button Width="40" HorizontalAlignment="Right" Margin="0,0,4,0" Background="Gray" Command="{Binding ToStatistics}">
+						<Path Data="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7V10h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
+							  Fill="Black"/>
+					</Button>
+					<Button Width="40" HorizontalAlignment="Right" Margin="0,0,4,0" Background="Gray" Command="{Binding ToUsers}">
+						<Path Data="M12 4c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zm0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"
+							  Fill="Black"/>
+					</Button>
+				</StackPanel>
+			
+			</Border>
+		</SplitView.Pane>
+		<SplitView.Content>
+		<UserControl Content="{Binding PageContent}"></UserControl>
+		</SplitView.Content>
+	</SplitView>
 </Window>

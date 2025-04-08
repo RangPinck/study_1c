@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:vm="using:Client.ViewModels"
+			 x:DataType="vm:UserStatisticsViewModel"
+             x:Class="Client.UserStatistics">
+
+	<Grid RowDefinitions="70, *, 85">
+		<Grid Grid.Row="0" Background="#D28530">
+			<!-- Courses Title -->
+			<Border CornerRadius="5" Background="White" Padding="20" Height="44" Width="292" Margin="20,35,0,0" HorizontalAlignment="Left">
+				<TextBlock Text="Статистика" FontSize="20" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			</Border>
+			<!-- Menu Icon -->
+			<Button Grid.Column="1"  Width="40" HorizontalAlignment="Right" Margin="0,0,9,0" Background="White">
+				<Path Data="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" Fill="Black"/>
+				<!-- Hamburger Icon (SVG Path) -->
+			</Button>
+		</Grid>
+			<ListBox Grid.Row="1" ItemsSource="{Binding Test}">
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<Border Background="#374151" Margin="2" Height="140" CornerRadius="4">
+							<Grid ColumnDefinitions="*,*,*">
+								<TextBlock Grid.Column="0" Margin="10,10,0,0" Foreground="White" Text="{Binding BlockName}"></TextBlock>
+								<StackPanel Grid.Column="1">
+									<TextBlock  Foreground="White" HorizontalAlignment="Center"> Пройденые блоки </TextBlock>
+									<Border Background="#D28530"><ListBox Grid.Row="1" ItemsSource="">
+									</ListBox>
+									</Border>			
+								</StackPanel>
+								<StackPanel Grid.Column="2">
+									<TextBlock  Foreground="White" HorizontalAlignment="Center"> Процент прохождения </TextBlock>
+									<Border Background="#D28530">
+										<ListBox Grid.Row="1" ItemsSource="">
+										</ListBox>
+									</Border>
+								</StackPanel>
+							</Grid>
+						</Border>
+
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+		
+	</Grid>
+</UserControl>

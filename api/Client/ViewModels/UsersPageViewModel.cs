@@ -21,5 +21,10 @@ namespace Client.ViewModels
             Test.Add(new TestClass() { BlockId = "4", BlockName = "Test4" });
 
         }
+
+        public void ToAddUser()
+        {
+            MainWindowViewModel.Instance.PageContent = new AddEditUser();
+        }
     }
 }

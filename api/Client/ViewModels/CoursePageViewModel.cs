@@ -13,8 +13,9 @@ namespace Client.ViewModels
 		private List<TestClass> _test = new();
 
         public List<TestClass> Test { get => _test; set => this.RaiseAndSetIfChanged(ref _test, value); }
+       
 
-		public CoursePageViewModel()
+        public CoursePageViewModel()
 		{
 			Test = new List<TestClass>();
 			Test.Add(new TestClass() { BlockId = "1", BlockName = "Test1"});
@@ -22,6 +23,11 @@ namespace Client.ViewModels
             Test.Add(new TestClass() { BlockId = "3", BlockName = "Test3" });
             Test.Add(new TestClass() { BlockId = "4", BlockName = "Test4" });
 
+        }
+
+        public void ToAddCourse()
+        {
+            MainWindowViewModel.Instance.PageContent = new AddEditCourse();
         }
     }
 }
