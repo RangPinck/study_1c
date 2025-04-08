@@ -244,12 +244,12 @@ namespace Study1CApi.Controllers
                 {
                     if (await _account.UpdateUserProfile(updateUser))
                     {
-                        authUser.Email = updateUser.Email;
+                        var result = await _userManager.SetEmailAsync(authUser, updateUser.Email);
                         authUser.NormalizedEmail = updateUser.Email.ToUpper();
                         authUser.UserName = updateUser.UserName + " " + updateUser.UserName + " " + updateUser.UserPatronymic;
                         authUser.NormalizedUserName = authUser.UserName.ToUpper();
                         authUser.ConcurrencyStamp = DateTime.UtcNow.ToString();
-                        var result = await _userManager.UpdateAsync(authUser);
+                        result = await _userManager.UpdateAsync(authUser);
 
                         if (!result.Succeeded) return BadRequest("Не корректные данные!");
                     }
@@ -272,12 +272,15 @@ namespace Study1CApi.Controllers
 
                         if (await _account.UpdateUserProfile(updateUser))
                         {
-                            userWillBeUpdate.Email = updateUser.Email;
+                            var result = await _userManager.SetEmailAsync(userWillBeUpdate, updateUser.Email);
+
+                            if (!result.Succeeded) return BadRequest("Не корректная почта!");
+
                             userWillBeUpdate.NormalizedEmail = updateUser.Email.ToUpper();
-                            userWillBeUpdate.UserName = updateUser.UserName + " " + updateUser.UserName + " " + updateUser.UserPatronymic;
-                            userWillBeUpdate.NormalizedUserName = userWillBeUpdate.UserName.ToUpper();
+                            userWillBeUpdate.UserName = updateUser.Email.ToLower();
+                            userWillBeUpdate.NormalizedUserName = updateUser.Email.ToUpper();
                             userWillBeUpdate.ConcurrencyStamp = DateTime.UtcNow.ToString();
-                            var result = await _userManager.UpdateAsync(userWillBeUpdate);
+                            result = await _userManager.UpdateAsync(userWillBeUpdate);
 
                             if (!result.Succeeded) return BadRequest("Не корректные данные!");
                         }
