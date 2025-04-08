@@ -36,7 +36,7 @@ public class Program
             swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
-                Description = "¬ведите действительный токен",
+                Description = "Enter the correct authorization token!",
                 Name = "Authorization",
                 Type = SecuritySchemeType.Http,
                 BearerFormat = "JWT",

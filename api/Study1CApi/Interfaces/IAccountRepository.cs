@@ -7,10 +7,10 @@ namespace Study1CApi.Interfaces
     {
         public Task<bool> UpdateUserProfile(UpdateProfileDTO updateProfile);
 
-        public Task<bool> SaveChengesAsync();
+        public Task<bool> SaveChangesAsync();
 
         public Task<UserDTO> GetUserDataByIdAsync(Guid userId);
 
-        public Task<bool> RegistrateUserFirstLogin(Guid userId);
+        public Task<bool> RegistrationUserFirstLogin(Guid userId);
     }
 }

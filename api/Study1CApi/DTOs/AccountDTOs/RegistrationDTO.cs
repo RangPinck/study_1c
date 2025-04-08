@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Study1CApi.DTOs.AuthDTO
 {
-    public class RegistartionDTO
+    public class RegistrationDTO
     {
         public bool IsFirst { get; set; }
 
