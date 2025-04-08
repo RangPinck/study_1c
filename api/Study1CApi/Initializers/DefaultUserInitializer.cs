@@ -45,10 +45,6 @@ namespace Study1CApi.Initializers
                 {
                     await context.Database.MigrateAsync();
                 }
-                else
-                {
-                    throw new Exception("Migrations doesn't exists");
-                }
 
                 foreach (var item in _roles)
                 {
@@ -69,7 +65,8 @@ namespace Study1CApi.Initializers
                         NormalizedUserName = adminName.ToUpper(),
                         NormalizedEmail = adminLogin.ToUpper(),
                         EmailConfirmed = true,
-                        PasswordHash = new PasswordHasher<AuthUser>().HashPassword(null, "admin1cdbapi")
+                        PasswordHash = new PasswordHasher<AuthUser>().HashPassword(null, "admin1cdbapi"),
+                        UserDataCreate = DateTime.UtcNow
                     };
 
                     var createUserResult = await userManager.CreateAsync(admin);

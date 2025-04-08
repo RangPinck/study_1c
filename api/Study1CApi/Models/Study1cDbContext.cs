@@ -29,6 +29,8 @@ public partial class Study1cDbContext : IdentityDbContext<AuthUser, Role, Guid>
 
     public virtual DbSet<Role> Roles { get; set; }
 
+    public virtual DbSet<UserCourse> UserCourses { get; set; }
+
     public virtual DbSet<StudyState> StudyStates { get; set; }
 
     public virtual DbSet<TasksPractice> TasksPractices { get; set; }
@@ -48,6 +50,25 @@ public partial class Study1cDbContext : IdentityDbContext<AuthUser, Role, Guid>
         modelBuilder.Entity<AuthUser>(entity =>
         {
             entity.HasOne(it => it.UserNavigation).WithOne(it => it.AuthUserNavigation).HasForeignKey<User>(it => it.UserId).OnDelete(DeleteBehavior.Cascade).IsRequired();
+        });
+
+        modelBuilder.Entity<UserCourse>(entity =>
+        {
+            entity.HasKey(e => e.CuId).HasName("pk_users_courses");
+
+            entity.ToTable("users_courses");
+
+            entity.Property(e => e.CuId)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("cu_id");
+
+            entity.HasOne(d => d.Course).WithMany(p => p.UserCourses)
+                .HasForeignKey(d => d.CourseId)
+                .HasConstraintName("fk_cu_courses");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserCourses)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("fk_cu_users");
         });
 
         modelBuilder.Entity<BlocksMaterial>(entity =>

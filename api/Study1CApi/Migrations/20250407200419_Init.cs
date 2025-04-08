@@ -32,6 +32,7 @@ namespace Study1CApi.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserDataCreate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -186,6 +187,31 @@ namespace Study1CApi.Migrations
                         column: x => x.course,
                         principalTable: "courses",
                         principalColumn: "course_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "users_courses",
+                columns: table => new
+                {
+                    cu_id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    CourseId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_users_courses", x => x.cu_id);
+                    table.ForeignKey(
+                        name: "fk_cu_courses",
+                        column: x => x.CourseId,
+                        principalTable: "courses",
+                        principalColumn: "course_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_cu_users",
+                        column: x => x.UserId,
+                        principalTable: "users",
+                        principalColumn: "user_id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -372,6 +398,16 @@ namespace Study1CApi.Migrations
                 column: "task");
 
             migrationBuilder.CreateIndex(
+                name: "IX_users_courses_CourseId",
+                table: "users_courses",
+                column: "CourseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_courses_UserId",
+                table: "users_courses",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_users_tasks_auth_user",
                 table: "users_tasks",
                 column: "auth_user");
@@ -402,6 +438,9 @@ namespace Study1CApi.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "users_courses");
 
             migrationBuilder.DropTable(
                 name: "users_tasks");

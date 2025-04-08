@@ -6,6 +6,8 @@ namespace Study1CApi.Models
     {
         public User UserNavigation { get; set; }
 
+        public DateTime UserDataCreate { get; set; }
+
         public AuthUser() { }
 
         public AuthUser(string userName) : this()

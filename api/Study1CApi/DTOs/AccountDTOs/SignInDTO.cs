@@ -14,6 +14,8 @@
 
         public bool IsFirst { get; set; }
 
+        public List<string> UserRole { get; set; } = new List<string>();
+
         public string Token { get; set; } = String.Empty;
     }
 }

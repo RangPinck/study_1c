@@ -29,7 +29,7 @@ namespace Study1CApi.Controllers
         {
             try
             {
-                var roles = await _roleManager.Roles.Select(role => new RoleDTO()
+                var roles = await _roleManager.Roles.AsNoTracking().Select(role => new RoleDTO()
                 {
                     RoleId = role.Id,
                     RoleName = role.Name

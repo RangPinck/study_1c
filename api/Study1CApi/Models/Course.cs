@@ -20,4 +20,6 @@ public partial class Course
     public virtual User AuthorNavigation { get; set; } = null!;
 
     public virtual ICollection<CoursesBlock> CoursesBlocks { get; set; } = new List<CoursesBlock>();
+
+    public virtual ICollection<UserCourse> UserCourses { get; set; } = new List<UserCourse>();
 }

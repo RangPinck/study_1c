@@ -4,6 +4,6 @@ namespace Study1CApi.Interfaces
 {
     public interface ITokenService
     {
-        string CreateToken(AuthUser user, string role);
+        public string CreateToken(AuthUser user, string role);
     }
 }
