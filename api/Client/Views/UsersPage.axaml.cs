@@ -5,12 +5,12 @@ using Client.ViewModels;
 
 namespace Client;
 
-public partial class CoursePage : UserControl
+public partial class UsersPage : UserControl
 {
-    public CoursePage()
+    public UsersPage()
     {
         InitializeComponent();
 
-        DataContext = new CoursePageViewModel();
+        DataContext = new UsersPageViewModel();
     }
 }

@@ -7,7 +7,7 @@ namespace Client.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
 
-        private UserControl _pageContent = new HelloPage();
+        private UserControl _pageContent = new UsersPage();
 
         public static Connection ApiClient = new Connection("http://localhost:7053/api/");
 

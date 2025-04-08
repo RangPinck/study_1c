@@ -6,14 +6,34 @@
 			 xmlns:vm="using:Client.ViewModels"
 			 x:DataType="vm:CoursePageViewModel"
              x:Class="Client.CoursePage">
-	<Grid>
-		<TextBlock>CoursePage </TextBlock>
-		<ListBox SelectionMode="Single"  ItemsSource="{Binding}" Grid.Row="1">
+	<Grid RowDefinitions="70, *, 85">
+		<Grid Grid.Row="0" Background="#D28530">
+				<!-- Courses Title -->
+				<Border CornerRadius="5" Background="White" Padding="20" Height="44" Width="292" Margin="20,35,0,0" HorizontalAlignment="Left">
+					<TextBlock Text="Курсы" FontSize="20" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+				</Border>
+				<!-- Menu Icon -->
+				<Button Grid.Column="1"  Width="40" HorizontalAlignment="Right" Margin="0,0,9,0" Background="White">
+					<Path Data="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" Fill="Black"/>
+					<!-- Hamburger Icon (SVG Path) -->
+				</Button>	
+		</Grid>
+		<ListBox SelectionMode="Single" ItemsSource="{Binding Test}" Grid.Row="1">
 			<ListBox.ItemTemplate>
-				<DataTemplate>
-				
+				<DataTemplate >
+					<Grid ColumnDefinitions="*,*" Background="#374151" Height="59">
+						<TextBlock VerticalAlignment="Center" Padding="40,0" Text="{Binding BlockName}" Foreground="White"></TextBlock>
+					</Grid>
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>
+		<Grid Grid.Row="2">
+			<!-- Add Burron -->
+			<Button Background="#D28530" Width="157" Height="45" HorizontalAlignment="Right" Foreground="White" Margin="30, 0">
+				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" >Добавить курс</TextBlock>
+			</Button>
+			
+		</Grid>
 	</Grid>
+	
 </UserControl>

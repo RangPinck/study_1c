@@ -23,7 +23,5 @@ namespace Client.Models
             get => _client;
             set => _client = value;
         }
-
-        public async Task<string> Ge
     }
 }

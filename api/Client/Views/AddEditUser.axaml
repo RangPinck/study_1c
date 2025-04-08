@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:vm="using:Client.ViewModels"
+			 x:DataType="vm:AddEditUserViewModel"
+             x:Class="Client.AddEditUser">
+	<Grid RowDefinitions="70, *, 85">
+		<Grid Grid.Row="0" Background="#D28530">
+			<!-- Courses Title -->
+			<Border CornerRadius="5" Background="White" Padding="20" Height="44" Width="292" Margin="20,35,0,0" HorizontalAlignment="Left">
+				<TextBlock Text="Добавить пользователя" FontSize="20" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			</Border>
+			<!-- Menu Icon -->
+			<Button Grid.Column="1"  Width="40" HorizontalAlignment="Right" Margin="0,0,9,0" Background="White">
+				<Path Data="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" Fill="Black"/>
+				<!-- Hamburger Icon (SVG Path) -->
+			</Button>
+		</Grid>
+		<Grid Grid.Row="1" ColumnDefinitions="*,2*,*">
+			<StackPanel Grid.Column="1">
+				<TextBlock FontSize="16" Padding="40,20,10,10" >
+					LogIn
+				</TextBlock>
+				<TextBox Width="325" Height="40" BorderBrush="">
+					
+				</TextBox>
+				<TextBlock FontSize="16" Padding="40,10,10,10" >
+					Password
+				</TextBlock>
+				<TextBox Width="325" Height="40" BorderBrush="">
+
+				</TextBox>
+				<TextBlock FontSize="16" Padding="40,10,10,10" >
+					Surename
+				</TextBlock>
+				<TextBox Width="325" Height="40" BorderBrush="">
+
+				</TextBox>
+				<TextBlock FontSize="16" Padding="40,10,10,10" >
+					Patronimyc
+				</TextBlock>
+				<TextBox Width="325" Height="40" BorderBrush="">
+
+				</TextBox>
+				<TextBlock FontSize="16" Padding="40,10,10,10" >
+					Role
+				</TextBlock>
+				<ComboBox Width="325" Height="40" Margin="40,0"></ComboBox>
+			</StackPanel>
+		</Grid>
+		<Grid Grid.Row="2">
+			<!-- Add Burron -->
+			<Button Background="#D28530" Width="157" Height="45" Padding="" HorizontalAlignment="Right" Foreground="White">
+				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16">Сохранить</TextBlock>
+			</Button>
+
+		</Grid>
+	</Grid>
+</UserControl>
