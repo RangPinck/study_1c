@@ -67,18 +67,31 @@ namespace Study1CApi.Repositories
             }).FirstOrDefaultAsync(x => x.CourseId == courseId);
         }
 
-        public async Task<IEnumerable<CourseAuthorDTO>> GetAuthorsForCourses()
+        public async Task<bool> AddCourse(AddCourseDTO newCourse)
         {
-            List<Guid> users = _userManager.GetUsersInRoleAsync("Администратор").Result.Select(x => x.Id).ToList();
-            users = [.. users, .. _userManager.GetUsersInRoleAsync("Куратор").Result.Select(x => x.Id).Distinct().ToList()];
-
-            return await _context.Users.AsNoTracking().Where(x => users.Contains(x.UserId)).Select(x => new CourseAuthorDTO()
+            var course = new Course()
             {
-                UserId = x.UserId,
-                UserName = x.UserName,
-                UserSurname = x.UserSurname,
-                UserPatronymic = x.UserPatronymic
-            }).ToListAsync();
+                CourseName = newCourse.Title,
+                CourseDataCreate = DateTime.UtcNow,
+                Description = newCourse.Description,
+                Link = newCourse.Link,
+                Author = newCourse.Author
+            };
+
+            await _context.Courses.AddAsync(course);
+
+            return await SaveChangesAsync();
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            var save = await _context.SaveChangesAsync();
+            return save > 0;
+        }
+
+        public async Task<bool> CourseComparisonByAuthorAndTitle(Guid authorId, string courseTitle)
+        {
+            return await _context.Courses.AnyAsync(x => x.CourseName == courseTitle && x.Author == authorId);
         }
     }
 }

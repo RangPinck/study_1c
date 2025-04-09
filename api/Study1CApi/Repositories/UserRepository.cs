@@ -58,5 +58,24 @@ namespace Study1CApi.Repositories
                 return new List<UserDTO>();
             }
         }
+
+        public async Task<bool> UserIsExist(Guid userId)
+        {
+            return await _context.Users.AnyAsync(x => x.UserId == userId);
+        }
+
+        public async Task<IEnumerable<CourseAuthorDTO>> GetAuthorsForCourses()
+        {
+            List<Guid> users = _userManager.GetUsersInRoleAsync("Администратор").Result.Select(x => x.Id).ToList();
+            users = [.. users, .. _userManager.GetUsersInRoleAsync("Куратор").Result.Select(x => x.Id).Distinct().ToList()];
+
+            return await _context.Users.AsNoTracking().Where(x => users.Contains(x.UserId)).Select(x => new CourseAuthorDTO()
+            {
+                UserId = x.UserId,
+                UserName = x.UserName,
+                UserSurname = x.UserSurname,
+                UserPatronymic = x.UserPatronymic
+            }).ToListAsync();
+        }
     }
 }

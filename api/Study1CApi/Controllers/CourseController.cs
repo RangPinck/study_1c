@@ -15,11 +15,13 @@ namespace Study1CApi.Controllers
     [Route("api/[controller]")]
     public class CourseController : ControllerBase
     {
-        private readonly ICourseRepository _course;
+        private readonly ICourseRepository _courseRepository;
+        private readonly IUserRepository _userRepository;
 
-        public CourseController(ICourseRepository course)
+        public CourseController(ICourseRepository course, IUserRepository userRepository)
         {
-            _course = course;
+            _courseRepository = course;
+            _userRepository = userRepository;
         }
 
         [SwaggerOperation(Summary = "Получение всех курсов")]
@@ -32,7 +34,7 @@ namespace Study1CApi.Controllers
         {
             try
             {
-                var courses = await _course.GetAllCourses();
+                var courses = await _courseRepository.GetAllCourses();
 
                 if (!ModelState.IsValid)
                 {
@@ -57,7 +59,7 @@ namespace Study1CApi.Controllers
         {
             try
             {
-                var course = await _course.GetCourseById(courseId);
+                var course = await _courseRepository.GetCourseById(courseId);
 
                 if (!ModelState.IsValid)
                 {
@@ -82,7 +84,7 @@ namespace Study1CApi.Controllers
         {
             try
             {
-                var authors = await _course.GetAuthorsForCourses();
+                var authors = await _userRepository.GetAuthorsForCourses();
 
                 if (!ModelState.IsValid)
                 {
@@ -90,6 +92,49 @@ namespace Study1CApi.Controllers
                 }
 
                 return Ok(authors);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
+
+        [SwaggerOperation(Summary = "Добавление курса")]
+        [HttpPost("AddCourse")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> AddCourse(AddCourseDTO newCourse)
+        {
+            try
+            {
+                if (await _courseRepository.CourseComparisonByAuthorAndTitle(newCourse.Author, newCourse.Title))
+                {
+                    return BadRequest("This course already exist.");
+                }
+
+                if (string.IsNullOrEmpty(newCourse.Title))
+                {
+                    return BadRequest("A course cannot exist without title.");
+                }
+
+                if (newCourse.Author == null)
+                {
+                    return BadRequest("A course cannot exist without author.");
+                }
+
+                if (!await _courseRepository.AddCourse(newCourse))
+                {
+                    return BadRequest("This course doesn't add to database. No correct data.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok("Operation success");
             }
             catch (Exception ex)
             {

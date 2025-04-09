@@ -14,6 +14,10 @@ namespace Study1CApi.Interfaces
 
         public Task<FullCourseDTO> GetCourseById(Guid courseId);
 
-        public Task <IEnumerable<CourseAuthorDTO>> GetAuthorsForCourses();
+        public Task<bool> AddCourse(AddCourseDTO newCourse);
+
+        public Task<bool> SaveChangesAsync();
+
+        public Task<bool> CourseComparisonByAuthorAndTitle(Guid authorId, string courseTitle);
     }
 }
