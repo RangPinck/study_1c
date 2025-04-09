@@ -69,6 +69,7 @@ public class Program
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IConnectionRepository, ConnectionRepository>();
+        builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 
         builder.Services.AddIdentity<AuthUser, Role>(options =>
         {
@@ -166,7 +167,7 @@ public class Program
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex.ToString());
             }
         }
 
