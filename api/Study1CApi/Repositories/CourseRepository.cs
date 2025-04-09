@@ -125,5 +125,17 @@ namespace Study1CApi.Repositories
 
             return course;
         }
+
+        public async Task<bool> DeleteCourse(Guid courseId)
+        {
+            var course = await _context.Courses.FirstOrDefaultAsync(x => x.CourseId == courseId);
+            _context.Courses.Remove(course);
+            return await SaveChangesAsync();
+        }
+
+        public async Task<bool> CheckSubsOnCourse(Guid courseId)
+        {
+            return await _context.UserCourses.AnyAsync(x => x.CourseId == courseId);
+        }
     }
 }

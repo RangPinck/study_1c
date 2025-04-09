@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Study1CApi.Models;
 using Study1CApi.DTOs.CourseDTOs;
-using Study1CApi.DTOs.UserDTOs;
 
 namespace Study1CApi.Interfaces
 {
@@ -23,5 +17,9 @@ namespace Study1CApi.Interfaces
         public Task<bool> CourseComparisonByAuthorAndTitle(Guid authorId, string courseTitle);
 
         public Task<StandardCourseDTO> GetCourseDataById(Guid courseId);
+
+        public Task<bool> DeleteCourse(Guid courseId);
+
+        public Task<bool> CheckSubsOnCourse(Guid courseId);
     }
 }

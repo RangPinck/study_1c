@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -152,7 +148,7 @@ namespace Study1CApi.Controllers
         }
 
         [SwaggerOperation(Summary = "Обновление курса")]
-        [HttpPost("UpdateCourse")]
+        [HttpPut("UpdateCourse")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -181,13 +177,65 @@ namespace Study1CApi.Controllers
                 {
                     if (authUser.Id != course.Author)
                     {
-                        return BadRequest("У вас не достаточно прав для данной операции!");
+                        return BadRequest("You don't have enough rights for this operation!");
                     }
                 }
 
                 if (!await _courseRepository.UpdateCourse(updatedCourse))
                 {
                     return BadRequest("This course doesn't update on database. No correct data.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
+
+        [SwaggerOperation(Summary = "Удаление курса")]
+        [HttpDelete("DeleteCourse")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> DeleteCourse(Guid courseId)
+        {
+            try
+            {
+                var deleteCourse = await _courseRepository.GetCourseDataById(courseId);
+
+                if (deleteCourse is null)
+                {
+                    return BadRequest("This course cannot exist.");
+                }
+
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+
+                if (!authUserRoles.Contains("Администратор"))
+                {
+                    if (authUser.Id != deleteCourse.Author)
+                    {
+                        return BadRequest("You don't have enough rights for this operation!");
+                    }
+                }
+
+                if (await _courseRepository.CheckSubsOnCourse(courseId))
+                {
+                    return BadRequest("This course doesn't delete. Users have subscribed to this course.");
+                }
+
+                if (!await _courseRepository.DeleteCourse(courseId))
+                {
+                    return BadRequest("This course doesn't delete. No correct data.");
                 }
 
                 if (!ModelState.IsValid)
