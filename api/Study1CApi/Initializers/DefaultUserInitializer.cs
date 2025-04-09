@@ -66,7 +66,7 @@ namespace Study1CApi.Initializers
                         NormalizedEmail = adminLogin.ToUpper(),
                         EmailConfirmed = true,
                         PasswordHash = new PasswordHasher<AuthUser>().HashPassword(null, "admin1cdbapi"),
-                        UserDataCreate = DateTime.UtcNow
+                        UserDataCreate = DateTime.UtcNow.AddHours(3)
                     };
 
                     var createUserResult = await userManager.CreateAsync(admin);

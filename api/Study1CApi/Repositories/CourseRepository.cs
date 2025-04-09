@@ -23,9 +23,9 @@ namespace Study1CApi.Repositories
             _userManager = userManager;
         }
 
-        public async Task<IEnumerable<CourseDTO>> GetAllCourses()
+        public async Task<IEnumerable<ShortCourseDTO>> GetAllCourses()
         {
-            return await _context.Courses.AsNoTracking().Select(x => new CourseDTO()
+            return await _context.Courses.AsNoTracking().Select(x => new ShortCourseDTO()
             {
                 CourseId = x.CourseId,
                 CourseName = x.CourseName,
@@ -72,7 +72,7 @@ namespace Study1CApi.Repositories
             var course = new Course()
             {
                 CourseName = newCourse.Title,
-                CourseDataCreate = DateTime.UtcNow,
+                CourseDataCreate = DateTime.UtcNow.AddHours(3),
                 Description = newCourse.Description,
                 Link = newCourse.Link,
                 Author = newCourse.Author
@@ -92,6 +92,38 @@ namespace Study1CApi.Repositories
         public async Task<bool> CourseComparisonByAuthorAndTitle(Guid authorId, string courseTitle)
         {
             return await _context.Courses.AnyAsync(x => x.CourseName == courseTitle && x.Author == authorId);
+        }
+
+        public async Task<bool> UpdateCourse(UpdateCourseDTO updatedCourse)
+        {
+            var course = await _context.Courses.FirstOrDefaultAsync(x => x.CourseId == updatedCourse.CourseId);
+
+            if (course == null)
+            {
+                return false;
+            }
+
+            course.CourseName = updatedCourse.Title;
+            course.Description = updatedCourse.Description;
+            course.Link = updatedCourse.Link;
+
+            _context.Courses.Update(course);
+
+            return await SaveChangesAsync();
+        }
+
+        public async Task<StandardCourseDTO> GetCourseDataById(Guid courseId)
+        {
+            var course = await _context.Courses.Select(x => new StandardCourseDTO()
+            {
+                CourseId = x.CourseId,
+                CourseName = x.CourseName,
+                Description = x.Description,
+                Link = x.Link,
+                Author = x.Author,
+            }).FirstOrDefaultAsync(x => x.CourseId == courseId);
+
+            return course;
         }
     }
 }

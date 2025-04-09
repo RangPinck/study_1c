@@ -56,7 +56,7 @@ namespace Study1CApi.Controllers
                     Email = registerDto.Email,
                     UserName = registerDto.Email.ToLower(),
                     EmailConfirmed = true,
-                    UserDataCreate = DateTime.UtcNow,
+                    UserDataCreate = DateTime.UtcNow.AddHours(3),
                 };
 
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
@@ -248,7 +248,7 @@ namespace Study1CApi.Controllers
                         authUser.NormalizedEmail = updateUser.Email.ToUpper();
                         authUser.UserName = updateUser.UserName + " " + updateUser.UserName + " " + updateUser.UserPatronymic;
                         authUser.NormalizedUserName = authUser.UserName.ToUpper();
-                        authUser.ConcurrencyStamp = DateTime.UtcNow.ToString();
+                        authUser.ConcurrencyStamp =DateTime.UtcNow.AddHours(3).ToString();
                         result = await _userManager.UpdateAsync(authUser);
 
                         if (!result.Succeeded) return BadRequest("Не корректные данные!");
@@ -279,7 +279,7 @@ namespace Study1CApi.Controllers
                             userWillBeUpdate.NormalizedEmail = updateUser.Email.ToUpper();
                             userWillBeUpdate.UserName = updateUser.Email.ToLower();
                             userWillBeUpdate.NormalizedUserName = updateUser.Email.ToUpper();
-                            userWillBeUpdate.ConcurrencyStamp = DateTime.UtcNow.ToString();
+                            userWillBeUpdate.ConcurrencyStamp = DateTime.UtcNow.AddHours(3).ToString();
                             result = await _userManager.UpdateAsync(userWillBeUpdate);
 
                             if (!result.Succeeded) return BadRequest("Не корректные данные!");

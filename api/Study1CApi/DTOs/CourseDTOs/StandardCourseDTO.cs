@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Study1CApi.DTOs.UserDTOs;
 
 namespace Study1CApi.DTOs.CourseDTOs
 {
-    public class ShortCourseDTO
+    public class StandardCourseDTO
     {
         public Guid CourseId { get; set; }
 
@@ -18,6 +17,6 @@ namespace Study1CApi.DTOs.CourseDTOs
 
         public string? Link { get; set; }
 
-        public AuthorOfCourseDTO Author { get; set; }
+        public Guid Author { get; set; }
     }
 }
