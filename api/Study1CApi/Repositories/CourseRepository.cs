@@ -8,15 +8,19 @@ using Study1CApi.Interfaces;
 using Study1CApi.Models;
 using Study1CApi.DTOs.UserDTOs;
 using Study1CApi.DTOs.BlockDTOs;
+using Microsoft.AspNetCore.Identity;
 
 namespace Study1CApi.Repositories
 {
     public class CourseRepository : ICourseRepository
     {
         private readonly Study1cDbContext _context;
-        public CourseRepository(Study1cDbContext context)
+        private readonly UserManager<AuthUser> _userManager;
+
+        public CourseRepository(Study1cDbContext context, UserManager<AuthUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<IEnumerable<CourseDTO>> GetAllCourses()
@@ -61,6 +65,20 @@ namespace Study1CApi.Repositories
                     BlockNumberOfCourse = block.BlockNumberOfCourse
                 }).ToList()
             }).FirstOrDefaultAsync(x => x.CourseId == courseId);
+        }
+
+        public async Task<IEnumerable<CourseAuthorDTO>> GetAuthorsForCourses()
+        {
+            List<Guid> users = _userManager.GetUsersInRoleAsync("Администратор").Result.Select(x => x.Id).ToList();
+            users = [.. users, .. _userManager.GetUsersInRoleAsync("Куратор").Result.Select(x => x.Id).Distinct().ToList()];
+
+            return await _context.Users.AsNoTracking().Where(x => users.Contains(x.UserId)).Select(x => new CourseAuthorDTO()
+            {
+                UserId = x.UserId,
+                UserName = x.UserName,
+                UserSurname = x.UserSurname,
+                UserPatronymic = x.UserPatronymic
+            }).ToListAsync();
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Study1CApi.Models;
 using Study1CApi.DTOs.CourseDTOs;
+using Study1CApi.DTOs.UserDTOs;
 
 namespace Study1CApi.Interfaces
 {
@@ -12,5 +13,7 @@ namespace Study1CApi.Interfaces
         public Task<IEnumerable<CourseDTO>> GetAllCourses();
 
         public Task<FullCourseDTO> GetCourseById(Guid courseId);
+
+        public Task <IEnumerable<CourseAuthorDTO>> GetAuthorsForCourses();
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Study1CApi.DTOs.CourseDTOs;
+using Study1CApi.DTOs.UserDTOs;
 using Study1CApi.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -64,6 +65,31 @@ namespace Study1CApi.Controllers
                 }
 
                 return Ok(course);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
+
+        [SwaggerOperation(Summary = "Получение возможных авторов курсов")]
+        [HttpGet("GetAuthorsForCourses")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<CourseAuthorDTO>))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> GetAuthorsForCourses()
+        {
+            try
+            {
+                var authors = await _course.GetAuthorsForCourses();
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(authors);
             }
             catch (Exception ex)
             {

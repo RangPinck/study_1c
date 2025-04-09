@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Study1CApi.DTOs.UserDTOs;
 
 namespace Study1CApi.DTOs.CourseDTOs
