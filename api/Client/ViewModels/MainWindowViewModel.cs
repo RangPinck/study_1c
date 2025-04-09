@@ -1,5 +1,8 @@
-﻿using Avalonia.Controls;
+﻿using System.Net;
+using System.Threading.Tasks;
+using Avalonia.Controls;
 using ReactiveUI;
+using Client.Models;
 using Tmds.DBus.Protocol;
 
 namespace Client.ViewModels
@@ -9,7 +12,7 @@ namespace Client.ViewModels
 
         private UserControl _pageContent = new UsersPage();
 
-        public static Connection ApiClient = new Connection("http://localhost:7053/api/");
+        public static ConnectionApi ApiClient = new ConnectionApi("http://localhost:5022/api/");
 
 
         public static MainWindowViewModel Instance;
@@ -17,9 +20,16 @@ namespace Client.ViewModels
             public MainWindowViewModel()
             {
                 Instance = this;
+
+                CheckConnection();
             }
 
-            public UserControl PageContent { get => _pageContent; set => this.RaiseAndSetIfChanged(ref _pageContent, value); }
+
+            private async Task CheckConnection()
+            {
+            var Check = await ApiClient.CheckAvailability() == HttpStatusCode.OK;
+            }
+        public UserControl PageContent { get => _pageContent; set => this.RaiseAndSetIfChanged(ref _pageContent, value); }
       
     }
 }
