@@ -13,8 +13,6 @@ namespace Study1CApi.DTOs.BlockDTOs
 
         public DateTime BlockDateCreated { get; set; }
 
-        public Guid Course { get; set; }
-
         public string? Description { get; set; }
 
         public int? BlockNumberOfCourse { get; set; }

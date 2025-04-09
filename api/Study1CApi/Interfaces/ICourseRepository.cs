@@ -10,5 +10,7 @@ namespace Study1CApi.Interfaces
     public interface ICourseRepository
     {
         public Task<IEnumerable<CourseDTO>> GetAllCourses();
+
+        public Task<FullCourseDTO> GetCourseById(Guid courseId);
     }
 }

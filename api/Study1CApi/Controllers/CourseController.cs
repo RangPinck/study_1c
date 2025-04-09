@@ -45,5 +45,30 @@ namespace Study1CApi.Controllers
                 return StatusCode(503, ex.Message);
             }
         }
+
+        [SwaggerOperation(Summary = "Получение курса по id")]
+        [HttpGet("GetCourseById")]
+        [ProducesResponseType(200, Type = typeof(FullCourseDTO))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize]
+        public async Task<IActionResult> GetCourseById(Guid courseId)
+        {
+            try
+            {
+                var course = await _course.GetCourseById(courseId);
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(course);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
     }
 }
