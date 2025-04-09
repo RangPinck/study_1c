@@ -1,6 +1,12 @@
-﻿using Avalonia.Controls;
+﻿using System.Net;
+using System.Threading.Tasks;
+using Avalonia.Controls;
 using ReactiveUI;
+<<<<<<< HEAD
 using System.Collections.Generic;
+=======
+using Client.Models;
+>>>>>>> 54cd5ff (fix: Made fixes for connection to API)
 using Tmds.DBus.Protocol;
 
 namespace Client.ViewModels
@@ -11,7 +17,7 @@ namespace Client.ViewModels
 
         private UserControl _pageContent = new CoursePage();
 
-        public static Connection ApiClient = new Connection("http://localhost:7053/api/");
+        public static ConnectionApi ApiClient = new ConnectionApi("http://localhost:5022/api/");
 
 
         public static MainWindowViewModel Instance;
@@ -19,8 +25,11 @@ namespace Client.ViewModels
             public MainWindowViewModel()
             {
                 Instance = this;
+
+                CheckConnection();
             }
 
+<<<<<<< HEAD
             public UserControl PageContent { get => _pageContent; set => this.RaiseAndSetIfChanged(ref _pageContent, value); }
         public bool IsPaneOpen { get => _isPaneOpen; set => this.RaiseAndSetIfChanged(ref _isPaneOpen, value); }
 
@@ -43,5 +52,14 @@ namespace Client.ViewModels
         {
             Instance.PageContent = new CoursePage();
         }
+=======
+
+            private async Task CheckConnection()
+            {
+            var Check = await ApiClient.CheckAvailability() == HttpStatusCode.OK;
+            }
+        public UserControl PageContent { get => _pageContent; set => this.RaiseAndSetIfChanged(ref _pageContent, value); }
+      
+>>>>>>> 54cd5ff (fix: Made fixes for connection to API)
     }
 }
