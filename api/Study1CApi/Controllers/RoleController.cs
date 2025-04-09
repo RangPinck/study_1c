@@ -48,6 +48,31 @@ namespace Study1CApi.Controllers
             }
         }
 
+        [SwaggerOperation(Summary = "Получение роли по id")]
+        [HttpGet("GetRoleById")]
+        [ProducesResponseType(200, Type = typeof(RoleDTO))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор")]
+        public async Task<IActionResult> GetRoleById(Guid roleId)
+        {
+            try
+            {
+                var role = await _roleManager.Roles.FirstOrDefaultAsync(x => x.Id == roleId);
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok(role);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
+
         [SwaggerOperation(Summary = "Добавление роли")]
         [HttpPost("AddRole")]
         [ProducesResponseType(204)]
