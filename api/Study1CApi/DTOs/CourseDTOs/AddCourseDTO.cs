@@ -20,6 +20,6 @@ namespace Study1CApi.DTOs.CourseDTOs
 
         [Required(ErrorMessage = "Не указан автор курса!")]
         [Display(Name = "Автор курса")]
-        public Guid Author { get; set; }
+        public Guid Author { get; set; } = new Guid();
     }
 }

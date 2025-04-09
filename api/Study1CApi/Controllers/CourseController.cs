@@ -119,9 +119,14 @@ namespace Study1CApi.Controllers
                     return BadRequest("A course cannot exist without title.");
                 }
 
-                if (newCourse.Author == null)
+                if (string.IsNullOrEmpty(newCourse.Author.ToString()))
                 {
                     return BadRequest("A course cannot exist without author.");
+                }
+                
+                if (!await _userRepository.UserIsExist(newCourse.Author))
+                {
+                    return BadRequest("This user doesn't exists in database");
                 }
 
                 if (!await _courseRepository.AddCourse(newCourse))
