@@ -18,7 +18,7 @@ namespace Client.ViewModels
 
 
 
-        private UserControl _pageContent = new CoursePage();
+        private UserControl _pageContent = new AuthPage();
 
         public static ConnectionApi ApiClient = new ConnectionApi("http://localhost:5022/api/");
 
@@ -30,8 +30,6 @@ namespace Client.ViewModels
                 Instance = this;
 
                 CheckConnection();
-
-            Authorize();
             }
         public UserControl PageContent { get => _pageContent; set => this.RaiseAndSetIfChanged(ref _pageContent, value); }
         public bool IsPaneOpen { get => _isPaneOpen; set => this.RaiseAndSetIfChanged(ref _isPaneOpen, value); }
@@ -59,28 +57,27 @@ namespace Client.ViewModels
             private async Task  CheckConnection()
             {
             var Check = await ApiClient.CheckAvailability() == HttpStatusCode.OK;
-
-            if (Check)
-            {
-
-            }
             }
 
 
-        private async Task Authorize()
+        public async Task Authorize(string Email, string Password)
         {
             LogInDTO logIn = new LogInDTO()
             {
-                Email = "admin@admin.com",
-                Password = "admin1cdbapi"
+                Email = Email,
+                Password = Password
             };
             var response = await ApiClient.LogInUser(logIn);
 
             CurrentUser = JsonConvert.DeserializeObject<UserResponse>(response);
 
-            if(CurrentUser != null)
+            if (CurrentUser != null)
             {
+                if (CurrentUser.IsFirst)  
                 PageContent = new HelloPage();
+                else 
+                    PageContent = new CoursePage();
+                
             }
         }
     }
