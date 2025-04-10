@@ -6,11 +6,17 @@ using System.Collections.Generic;
 using Client.Models;
 using Client.Models;
 using Tmds.DBus.Protocol;
+using Client.Models.Account;
+using Newtonsoft.Json;
 
 namespace Client.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
+
+        UserResponse currentUser = new UserResponse();
+
+
 
         private UserControl _pageContent = new CoursePage();
 
@@ -24,9 +30,12 @@ namespace Client.ViewModels
                 Instance = this;
 
                 CheckConnection();
+
+            Authorize();
             }
-            public UserControl PageContent { get => _pageContent; set => this.RaiseAndSetIfChanged(ref _pageContent, value); }
+        public UserControl PageContent { get => _pageContent; set => this.RaiseAndSetIfChanged(ref _pageContent, value); }
         public bool IsPaneOpen { get => _isPaneOpen; set => this.RaiseAndSetIfChanged(ref _isPaneOpen, value); }
+        public UserResponse CurrentUser { get => currentUser; set => this.RaiseAndSetIfChanged(ref currentUser, value); }
 
         private bool _isPaneOpen = false;
         public void PaneState()
@@ -47,10 +56,32 @@ namespace Client.ViewModels
         {
             Instance.PageContent = new CoursePage();
         }
-            private async Task CheckConnection()
+            private async Task  CheckConnection()
             {
             var Check = await ApiClient.CheckAvailability() == HttpStatusCode.OK;
+
+            if (Check)
+            {
+
             }
-        public UserControl PageContent { get => _pageContent; set => this.RaiseAndSetIfChanged(ref _pageContent, value); }
+            }
+
+
+        private async Task Authorize()
+        {
+            LogInDTO logIn = new LogInDTO()
+            {
+                Email = "admin@admin.com",
+                Password = "admin1cdbapi"
+            };
+            var response = await ApiClient.LogInUser(logIn);
+
+            CurrentUser = JsonConvert.DeserializeObject<UserResponse>(response);
+
+            if(CurrentUser != null)
+            {
+                PageContent = new HelloPage();
+            }
+        }
     }
 }
