@@ -47,7 +47,7 @@ namespace Study1CApi.Controllers
 
                 IEnumerable<ShortBlockDTO> blocks = new List<ShortBlockDTO>();
 
-                if (!authUserRoles.Contains("Администратор") && !authUserRoles.Contains("Куратор") && !await _courseRepository.CheckUserSubscribeOnCourse(subCheck))
+                if (!authUserRoles.Contains("Администратор") && !authUserRoles.Contains("Куратор") && !await _courseRepository.CheckUserSubscribeOnCourseAsync(subCheck))
                 {
                     return BadRequest("User doesnt subscribe to course!");
                 }
@@ -69,52 +69,57 @@ namespace Study1CApi.Controllers
             }
         }
 
-        //[SwaggerOperation(Summary = "Добавление блока")]
-        //[HttpPost("AddBlock")]
-        //[ProducesResponseType(204)]
-        //[ProducesResponseType(400)]
-        //[ProducesResponseType(500)]
-        //[Authorize(Roles = "Администратор, Куратор")]
-        //public async Task<IActionResult> AddBlock(AddCourseDTO newCourse)
-        //{
-        //    try
-        //    {
-        //        if (await _courseRepository.CourseComparisonByAuthorAndTitle(newCourse.Author, newCourse.Title))
-        //        {
-        //            return BadRequest("This course already exist.");
-        //        }
+        [SwaggerOperation(Summary = "Добавление блока (раздела) курса")]
+        [HttpPost("AddBlock")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> AddBlock(AddBlockDTO newBlock)
+        {
+            try
+            {
+                if (!await _courseRepository.CourseIsExistByIdAsync(newBlock.Course))
+                {
+                    return BadRequest("Course not found!");
+                }
 
-        //        if (string.IsNullOrEmpty(newCourse.Title))
-        //        {
-        //            return BadRequest("A course cannot exist without title.");
-        //        }
+                if (string.IsNullOrEmpty(newBlock.BlockName))
+                {
+                    return BadRequest("A block cannot exist without title.");
+                }
 
-        //        if (string.IsNullOrEmpty(newCourse.Author.ToString()))
-        //        {
-        //            return BadRequest("A course cannot exist without author.");
-        //        }
+                if (await _blockRepository.BlockIsExistByTitleAsync(newBlock.Course, newBlock.BlockName))
+                {
+                    return BadRequest("This block already exist.");
+                }
 
-        //        if (!await _userRepository.UserIsExist(newCourse.Author))
-        //        {
-        //            return BadRequest("This user doesn't exists in database");
-        //        }
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+                var course = await _courseRepository.GetCourseDataByIdAsync(newBlock.Course);
 
-        //        if (!await _courseRepository.AddCourse(newCourse))
-        //        {
-        //            return BadRequest("This course doesn't add to database. No correct data.");
-        //        }
+                if (!authUserRoles.Contains("Администратор") && authUser.Id != course.Author)
+                {
+                    return BadRequest("You don't have enough rights for this operation!");
+                }
 
-        //        if (!ModelState.IsValid)
-        //        {
-        //            return BadRequest();
-        //        }
+                if (!await _blockRepository.AddBlockAsync(newBlock))
+                {
+                    return BadRequest("This block doesn't add to database. No correct data.");
+                }
 
-        //        return Ok("Operation success");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(503, ex.Message);
-        //    }
-        //}
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
     }
 }

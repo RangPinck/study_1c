@@ -17,7 +17,7 @@ namespace Study1CApi.Repositories
             _context = context;
         }
 
-        public async Task<CheckConnectionDTO> CheckConnectionAsync()
+        public async Task<CheckConnectionDTO> CheckConnectionAsyncAsync()
         {
             using (var connection = new Study1cDbContext())
             {

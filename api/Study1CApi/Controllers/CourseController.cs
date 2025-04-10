@@ -42,17 +42,17 @@ namespace Study1CApi.Controllers
 
                 if (authUserRoles.Contains("Администратор"))
                 {
-                    courses = await _courseRepository.GetAllCourses();
+                    courses = await _courseRepository.GetAllCoursesAsync();
                 }
                 else
                 {
                     if (authUserRoles.Contains("Куратор"))
                     {
-                        courses = await _courseRepository.GetCoursesThatUserCreate(authUser.Id);
+                        courses = await _courseRepository.GetCoursesThatUserCreateAsync(authUser.Id);
                     }
                     else
                     {
-                        courses = await _courseRepository.GetCoursesThatUserSubscribe(authUser.Id);
+                        courses = await _courseRepository.GetCoursesThatUserSubscribeAsync(authUser.Id);
                     }
                 }
 
@@ -79,7 +79,7 @@ namespace Study1CApi.Controllers
         {
             try
             {
-                var course = await _courseRepository.GetCourseById(courseId);
+                var course = await _courseRepository.GetCourseByIdAsync(courseId);
 
                 if (!ModelState.IsValid)
                 {
@@ -104,7 +104,7 @@ namespace Study1CApi.Controllers
         {
             try
             {
-                var authors = await _userRepository.GetAuthorsForCourses();
+                var authors = await _userRepository.GetAuthorsForCoursesAsync();
 
                 if (!ModelState.IsValid)
                 {
@@ -129,7 +129,7 @@ namespace Study1CApi.Controllers
         {
             try
             {
-                if (await _courseRepository.CourseComparisonByAuthorAndTitle(newCourse.Author, newCourse.Title))
+                if (await _courseRepository.CourseComparisonByAuthorAndTitleAsync(newCourse.Author, newCourse.Title))
                 {
                     return BadRequest("This course already exist.");
                 }
@@ -144,12 +144,12 @@ namespace Study1CApi.Controllers
                     return BadRequest("A course cannot exist without author.");
                 }
 
-                if (!await _userRepository.UserIsExist(newCourse.Author))
+                if (!await _userRepository.UserIsExistAsync(newCourse.Author))
                 {
                     return BadRequest("This user doesn't exists in database");
                 }
 
-                if (!await _courseRepository.AddCourse(newCourse))
+                if (!await _courseRepository.AddCourseAsync(newCourse))
                 {
                     return BadRequest("This course doesn't add to database. No correct data.");
                 }
@@ -157,6 +157,59 @@ namespace Study1CApi.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest();
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
+
+        [SwaggerOperation(Summary = "Подписка пользователя на курс")]
+        [HttpPost("SubscribeUserForACourse")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> SubscribeUserForACourse(SubscribeUserCourseDTO suc)
+        {
+            try
+            {
+                var courseData = await _courseRepository.GetCourseDataByIdAsync(suc.courseId);
+                if (courseData == null)
+                {
+                    return BadRequest("This course doesn't exist.");
+                }
+
+                var user = await _userManager.FindByIdAsync(suc.userId.ToString());
+
+                if (user == null)
+                {
+                    return BadRequest("User not found!");
+                }
+
+                if (await _courseRepository.CheckUserSubscribeOnCourseAsync(suc))
+                {
+                    return BadRequest("User already subscribe!");
+                }
+
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+
+                if (!authUserRoles.Contains("Администратор"))
+                {
+                    if (authUser.Id != courseData.Author)
+                    {
+                        return BadRequest("You don't have enough rights for this operation!");
+                    }
+                }
+
+                if (!await _courseRepository.SubscribeUserForACourseAsync(suc))
+                {
+                    return BadRequest("This user doesn't subscribe to course. No correct data.");
                 }
 
                 return Ok("Operation success");
@@ -177,7 +230,7 @@ namespace Study1CApi.Controllers
         {
             try
             {
-                var course = await _courseRepository.GetCourseDataById(updatedCourse.CourseId);
+                var course = await _courseRepository.GetCourseDataByIdAsync(updatedCourse.CourseId);
 
                 if (course == null)
                 {
@@ -201,7 +254,7 @@ namespace Study1CApi.Controllers
                     }
                 }
 
-                if (!await _courseRepository.UpdateCourse(updatedCourse))
+                if (!await _courseRepository.UpdateCourseAsync(updatedCourse))
                 {
                     return BadRequest("This course doesn't update on database. No correct data.");
                 }
@@ -229,7 +282,7 @@ namespace Study1CApi.Controllers
         {
             try
             {
-                var deleteCourse = await _courseRepository.GetCourseDataById(courseId);
+                var deleteCourse = await _courseRepository.GetCourseDataByIdAsync(courseId);
 
                 if (deleteCourse is null)
                 {
@@ -248,12 +301,12 @@ namespace Study1CApi.Controllers
                     }
                 }
 
-                if (await _courseRepository.CheckSubsOnCourse(courseId))
+                if (await _courseRepository.CheckSubsOnCourseAsync(courseId))
                 {
                     return BadRequest("This course doesn't delete. Users have subscribed to this course.");
                 }
 
-                if (!await _courseRepository.DeleteCourse(courseId))
+                if (!await _courseRepository.DeleteCourseAsync(courseId))
                 {
                     return BadRequest("This course doesn't delete. No correct data.");
                 }
@@ -261,59 +314,6 @@ namespace Study1CApi.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest();
-                }
-
-                return Ok("Operation success");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(503, ex.Message);
-            }
-        }
-
-        [SwaggerOperation(Summary = "Подписка пользователя на курс")]
-        [HttpPost("SubscribeUserForACourse")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        [Authorize(Roles = "Администратор, Куратор")]
-        public async Task<IActionResult> SubscribeUserForACourse(SubscribeUserCourseDTO suc)
-        {
-            try
-            {
-                var courseData = await _courseRepository.GetCourseDataById(suc.courseId);
-                if (courseData == null)
-                {
-                    return BadRequest("This course doesn't exist.");
-                }
-
-                var user = await _userManager.FindByIdAsync(suc.userId.ToString());
-
-                if (user == null)
-                {
-                    return BadRequest("User not found!");
-                }
-
-                if (await _courseRepository.CheckUserSubscribeOnCourse(suc))
-                {
-                    return BadRequest("User already subscribe!");
-                }
-
-                var httpUser = HttpContext.User;
-                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
-                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
-
-                if (!authUserRoles.Contains("Администратор"))
-                {
-                    if (authUser.Id != courseData.Author)
-                    {
-                        return BadRequest("You don't have enough rights for this operation!");
-                    }
-                }
-
-                if (!await _courseRepository.SubscribeUserForACourse(suc))
-                {
-                    return BadRequest("This user doesn't subscribe to course. No correct data.");
                 }
 
                 return Ok("Operation success");
@@ -334,7 +334,7 @@ namespace Study1CApi.Controllers
         {
             try
             {
-                var courseData = await _courseRepository.GetCourseDataById(suc.courseId);
+                var courseData = await _courseRepository.GetCourseDataByIdAsync(suc.courseId);
                 if (courseData == null)
                 {
                     return BadRequest("This course doesn't exist.");
@@ -347,7 +347,7 @@ namespace Study1CApi.Controllers
                     return BadRequest("User not found!");
                 }
 
-                if (!await _courseRepository.CheckUserSubscribeOnCourse(suc))
+                if (!await _courseRepository.CheckUserSubscribeOnCourseAsync(suc))
                 {
                     return BadRequest("User doesn't subscribe!");
                 }
@@ -364,7 +364,7 @@ namespace Study1CApi.Controllers
                     }
                 }
 
-                if (!await _courseRepository.UnsubscribeUserForACourse(suc))
+                if (!await _courseRepository.UnsubscribeUserForACourseAsync(suc))
                 {
                     return BadRequest("This user doesn't unsubscribe of course. No correct data.");
                 }

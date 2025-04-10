@@ -29,7 +29,7 @@ namespace Study1CApi.Repositories
             };
         }
 
-        public async Task<bool> RegistrationUserFirstLogin(Guid userId)
+        public async Task<bool> RegistrationUserFirstLoginAsync(Guid userId)
         {
             var profile = await _context.Users.FirstAsync(x => x.UserId == userId);
 
@@ -46,7 +46,7 @@ namespace Study1CApi.Repositories
             return save > 0;
         }
 
-        public async Task<bool> UpdateUserProfile(UpdateProfileDTO updateProfile)
+        public async Task<bool> UpdateUserProfileAsync(UpdateProfileDTO updateProfile)
         {
 
             var profile = await _context.Users.FirstAsync(x => x.UserId == updateProfile.UserId);

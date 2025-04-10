@@ -9,7 +9,7 @@ namespace Study1CApi.Interfaces
 {
     public interface IConnectionRepository
     {
-        public Task<CheckConnectionDTO> CheckConnectionAsync();
+        public Task<CheckConnectionDTO> CheckConnectionAsyncAsync();
 
         public Study1cDbContext CreateNewContext();
     }

@@ -6,8 +6,10 @@ namespace Study1CApi.Interfaces
     {
         public Task<IEnumerable<ShortBlockDTO>> GetBlocksOfCourseAsync(Guid courseId);
 
-        public Task<bool> AddBlock(AddBlockDTO newBlock);
+        public Task<bool> AddBlockAsync(AddBlockDTO newBlock);
 
         public Task<bool> SaveChangesAsync();
+
+        public Task<bool> BlockIsExistByTitleAsync(Guid courseId, string title);
     }
 }

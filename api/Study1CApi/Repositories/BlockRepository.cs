@@ -32,23 +32,35 @@ namespace Study1CApi.Repositories
             }).ToListAsync();
         }
 
-        public async Task<bool> AddBlock(AddBlockDTO newBlock)
+        public async Task<bool> AddBlockAsync(AddBlockDTO newBlock)
         {
 
-            var lastBlockCourseNumber = _context.CoursesBlocks.Where(x => x.Course == newBlock.Course).OrderByDescending(x=> x.BlockNumberOfCourse).First().BlockNumberOfCourse;
+            var course = await _context.CoursesBlocks.Where(x => x.Course == newBlock.Course).OrderByDescending(x => x.BlockNumberOfCourse).FirstOrDefaultAsync();
+
+            int blockNumber = 1;
+
+            if (course != null)
+            {
+                blockNumber = (int)course.BlockNumberOfCourse;
+            }
 
             CoursesBlock block = new CoursesBlock()
             {
                 BlockName = newBlock.BlockName,
-                BlockDateCreated = DateTime.UtcNow.AddHours(3),
+                BlockDateCreated = DateTime.UtcNow,
                 Course = newBlock.Course,
                 Description = newBlock.Description,
-                BlockNumberOfCourse = lastBlockCourseNumber + 1
+                BlockNumberOfCourse = blockNumber + 1
             };
 
             await _context.CoursesBlocks.AddAsync(block);
 
             return await SaveChangesAsync();
+        }
+
+        public async Task<bool> BlockIsExistByTitleAsync(Guid courseId, string title)
+        {
+            return await _context.CoursesBlocks.AnyAsync(x => x.BlockName == title && x.Course == courseId);
         }
     }
 }
