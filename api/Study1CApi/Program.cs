@@ -70,6 +70,7 @@ public class Program
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IConnectionRepository, ConnectionRepository>();
         builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+        builder.Services.AddScoped<IBlockRepository, BlockRepository>();
 
         builder.Services.AddIdentity<AuthUser, Role>(options =>
         {

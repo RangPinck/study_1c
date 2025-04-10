@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Study1CApi.DTOs.CourseDTOs;
 using Study1CApi.Interfaces;
@@ -114,7 +110,7 @@ namespace Study1CApi.Repositories
 
         public async Task<StandardCourseDTO> GetCourseDataById(Guid courseId)
         {
-            var course = await _context.Courses.Select(x => new StandardCourseDTO()
+            var course = await _context.Courses.AsNoTracking().Select(x => new StandardCourseDTO()
             {
                 CourseId = x.CourseId,
                 CourseName = x.CourseName,
@@ -136,6 +132,67 @@ namespace Study1CApi.Repositories
         public async Task<bool> CheckSubsOnCourse(Guid courseId)
         {
             return await _context.UserCourses.AnyAsync(x => x.CourseId == courseId);
+        }
+
+        public async Task<bool> SubscribeUserForACourse(SubscribeUserCourseDTO suc)
+        {
+            await _context.UserCourses.AddAsync(new UserCourse()
+            {
+                CourseId = suc.courseId,
+                UserId = suc.userId
+            });
+
+            return await SaveChangesAsync();
+        }
+
+        public async Task<bool> UnsubscribeUserForACourse(SubscribeUserCourseDTO suc)
+        {
+            var uc = await _context.UserCourses.FirstOrDefaultAsync(x => x.CourseId == suc.courseId && x.UserId == suc.userId);
+            _context.UserCourses.Remove(uc);
+            return await SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserSubscribe(Guid userId)
+        {
+            List<Guid> listSubscribleCourses = await _context.UserCourses.Where(x => x.UserId == userId).Select(x => x.CourseId).ToListAsync();
+
+            return await _context.Courses.AsNoTracking().Where(x => listSubscribleCourses.Contains(x.CourseId)).Select(x => new ShortCourseDTO()
+            {
+                CourseId = x.CourseId,
+                CourseName = x.CourseName,
+                CourseDataCreate = x.CourseDataCreate,
+                Description = x.Description,
+                Author = new AuthorOfCourseDTO()
+                {
+                    UserSurname = x.AuthorNavigation.UserSurname,
+                    UserName = x.AuthorNavigation.UserName,
+                    UserPatronymic = x.AuthorNavigation.UserPatronymic
+                }
+
+            }).ToListAsync();
+        }
+
+        public async Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserCreate(Guid authorId)
+        {
+            return await _context.Courses.AsNoTracking().Where(x => x.Author == authorId).Select(x => new ShortCourseDTO()
+            {
+                CourseId = x.CourseId,
+                CourseName = x.CourseName,
+                CourseDataCreate = x.CourseDataCreate,
+                Description = x.Description,
+                Author = new AuthorOfCourseDTO()
+                {
+                    UserSurname = x.AuthorNavigation.UserSurname,
+                    UserName = x.AuthorNavigation.UserName,
+                    UserPatronymic = x.AuthorNavigation.UserPatronymic
+                }
+
+            }).ToListAsync();
+        }
+
+        public async Task<bool> CheckUserSubscribeOnCourse(SubscribeUserCourseDTO suc)
+        {
+            return await _context.UserCourses.AnyAsync(x => x.UserId == suc.userId && suc.courseId == x.CourseId);
         }
     }
 }

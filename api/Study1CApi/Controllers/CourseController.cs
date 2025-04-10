@@ -34,7 +34,27 @@ namespace Study1CApi.Controllers
         {
             try
             {
-                var courses = await _courseRepository.GetAllCourses();
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+
+                IEnumerable<ShortCourseDTO> courses = new List<ShortCourseDTO>();
+
+                if (authUserRoles.Contains("Администратор"))
+                {
+                    courses = await _courseRepository.GetAllCourses();
+                }
+                else
+                {
+                    if (authUserRoles.Contains("Куратор"))
+                    {
+                        courses = await _courseRepository.GetCoursesThatUserCreate(authUser.Id);
+                    }
+                    else
+                    {
+                        courses = await _courseRepository.GetCoursesThatUserSubscribe(authUser.Id);
+                    }
+                }
 
                 if (!ModelState.IsValid)
                 {
@@ -241,6 +261,112 @@ namespace Study1CApi.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest();
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
+
+        [SwaggerOperation(Summary = "Подписка пользователя на курс")]
+        [HttpPost("SubscribeUserForACourse")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> SubscribeUserForACourse(SubscribeUserCourseDTO suc)
+        {
+            try
+            {
+                var courseData = await _courseRepository.GetCourseDataById(suc.courseId);
+                if (courseData == null)
+                {
+                    return BadRequest("This course doesn't exist.");
+                }
+
+                var user = await _userManager.FindByIdAsync(suc.userId.ToString());
+
+                if (user == null)
+                {
+                    return BadRequest("User not found!");
+                }
+
+                if (await _courseRepository.CheckUserSubscribeOnCourse(suc))
+                {
+                    return BadRequest("User already subscribe!");
+                }
+
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+
+                if (!authUserRoles.Contains("Администратор"))
+                {
+                    if (authUser.Id != courseData.Author)
+                    {
+                        return BadRequest("You don't have enough rights for this operation!");
+                    }
+                }
+
+                if (!await _courseRepository.SubscribeUserForACourse(suc))
+                {
+                    return BadRequest("This user doesn't subscribe to course. No correct data.");
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
+
+        [SwaggerOperation(Summary = "Отписка пользователя от курса")]
+        [HttpDelete("UnsubscribeUserForACourse")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> UnsubscribeUserForACourse(SubscribeUserCourseDTO suc)
+        {
+            try
+            {
+                var courseData = await _courseRepository.GetCourseDataById(suc.courseId);
+                if (courseData == null)
+                {
+                    return BadRequest("This course doesn't exist.");
+                }
+
+                var user = await _userManager.FindByIdAsync(suc.userId.ToString());
+
+                if (user == null)
+                {
+                    return BadRequest("User not found!");
+                }
+
+                if (!await _courseRepository.CheckUserSubscribeOnCourse(suc))
+                {
+                    return BadRequest("User doesn't subscribe!");
+                }
+
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+
+                if (!authUserRoles.Contains("Администратор"))
+                {
+                    if (authUser.Id != courseData.Author)
+                    {
+                        return BadRequest("You don't have enough rights for this operation!");
+                    }
+                }
+
+                if (!await _courseRepository.UnsubscribeUserForACourse(suc))
+                {
+                    return BadRequest("This user doesn't unsubscribe of course. No correct data.");
                 }
 
                 return Ok("Operation success");

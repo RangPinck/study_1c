@@ -21,5 +21,15 @@ namespace Study1CApi.Interfaces
         public Task<bool> DeleteCourse(Guid courseId);
 
         public Task<bool> CheckSubsOnCourse(Guid courseId);
+
+        public Task<bool> SubscribeUserForACourse(SubscribeUserCourseDTO  suc);
+
+        public Task<bool> UnsubscribeUserForACourse(SubscribeUserCourseDTO suc);
+
+        public Task<bool> CheckUserSubscribeOnCourse(SubscribeUserCourseDTO suc);
+
+        public Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserSubscribe(Guid userId);
+
+        public Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserCreate(Guid authorId);
     }
 }
