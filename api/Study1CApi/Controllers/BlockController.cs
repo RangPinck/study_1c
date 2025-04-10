@@ -121,5 +121,108 @@ namespace Study1CApi.Controllers
                 return StatusCode(503, ex.Message);
             }
         }
+
+
+        [SwaggerOperation(Summary = "Обновление блока")]
+        [HttpPut("UpdateBlock")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> UpdateBlock(UpdateBlockDTO updateBlock)
+        {
+            try
+            {
+                var course = await _blockRepository.GetCourseByBlockIdAsync(updateBlock.BlockId);
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+
+                if (!authUserRoles.Contains("Администратор"))
+                {
+                    if (authUser.Id != course.Author)
+                    {
+                        return BadRequest("You don't have enough rights for this operation!");
+                    }
+                }
+
+                if (!await _blockRepository.BlockIsExistByIdAsync(updateBlock.BlockId))
+                {
+                    return BadRequest("This block not found.");
+                }
+
+                if (await _blockRepository.BlockIsExistByTitleAsync(course.CourseId, updateBlock.BlockName))
+                {
+                    return BadRequest("Block with this title was exists!");
+                }
+
+                if (!await _blockRepository.UpdateBlockAsync(updateBlock))
+                {
+                    return BadRequest("This block doesn't update on database. No correct data.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
+
+        [SwaggerOperation(Summary = "Удаление блока")]
+        [HttpDelete("DeleteBlock")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> DeleteBlock(Guid blockId)
+        {
+            try
+            {
+                var course = await _blockRepository.GetCourseByBlockIdAsync(blockId);
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+
+                if (!authUserRoles.Contains("Администратор"))
+                {
+                    if (authUser.Id != course.Author)
+                    {
+                        return BadRequest("You don't have enough rights for this operation!");
+                    }
+                }
+
+                if (!await _blockRepository.BlockIsExistByIdAsync(blockId))
+                {
+                    return BadRequest("This block not found.");
+                }
+
+                if (await _blockRepository.CompletedTasksFromTheBlockIsExistsAsync(blockId))
+                {
+                    return BadRequest("This block doesn't delete. Users have complete task of this block.");
+                }
+
+                if (!await _blockRepository.DeleteBlockAsync(blockId))
+                {
+                    return BadRequest("This block doesn't delete. No correct data.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
     }
 }
