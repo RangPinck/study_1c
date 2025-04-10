@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Client.Models;
+using Client.Models.Account;
+using Client.Models.Users;
+using Newtonsoft.Json;
 using ReactiveUI;
 
 namespace Client.ViewModels
@@ -8,23 +12,27 @@ namespace Client.ViewModels
 	public class UsersPageViewModel : ViewModelBase
 	{
 
-		private List<TestClass> _test = new();
+		private List<UserDTO> _users = new();
 
-        public List<TestClass> Test { get => _test; set => this.RaiseAndSetIfChanged(ref _test, value); }
+        public List<UserDTO> Users { get => _users; set => this.RaiseAndSetIfChanged(ref _users, value); }
 
         public UsersPageViewModel()
         {
-            Test = new List<TestClass>();
-            Test.Add(new TestClass() { BlockId = "1", BlockName = "Test1" });
-            Test.Add(new TestClass() { BlockId = "2", BlockName = "Test2" });
-            Test.Add(new TestClass() { BlockId = "3", BlockName = "Test3" });
-            Test.Add(new TestClass() { BlockId = "4", BlockName = "Test4" });
+           
+            GetUsers();
 
         }
 
         public void ToAddUser()
         {
             MainWindowViewModel.Instance.PageContent = new AddEditUser();
+        }
+
+        async Task GetUsers()
+        {
+            var response = await MainWindowViewModel.ApiClient.GetAllUsers(MainWindowViewModel.Instance.CurrentUser.Token);
+
+            Users = JsonConvert.DeserializeObject<List<UserDTO>>(response);
         }
     }
 }

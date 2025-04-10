@@ -12,7 +12,7 @@ namespace Client.Models.Account
         public string Email { get; set; }
         public string UserSurname { get; set; }
         public string UserName { get; set; }
-        public string UserPatronymic { get; set; } // Может быть null
+        public string? UserPatronymic { get; set; }
         public bool IsFirst { get; set; }
         public List<string> UserRole { get; set; }
         public string Token { get; set; }

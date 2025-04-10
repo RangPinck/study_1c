@@ -7,6 +7,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using Client.Models.Account;
+using Client.Models.Users;
 
 namespace Client.Models
 {
@@ -39,6 +40,15 @@ namespace Client.Models
 
             HttpResponseMessage response = await Client.PostAsync("Account/Login", loginEnterSerialize);
 
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            return responseBody;
+        }
+
+        public async Task<string> GetAllUsers(string token)
+        {
+            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            HttpResponseMessage response = await Client.GetAsync("User/GetAllUsers");
             string responseBody = await response.Content.ReadAsStringAsync();
 
             return responseBody;

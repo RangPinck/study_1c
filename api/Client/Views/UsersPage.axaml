@@ -15,7 +15,7 @@
 			<!-- Menu Icon -->
 		</Grid>
 		
-		<ListBox Grid.Row="1" ItemsSource="{Binding Test}" Background="White">
+		<ListBox Grid.Row="1" ItemsSource="{Binding Users}" Background="White">
 			<ListBox.ItemsPanel>
 				<ItemsPanelTemplate>
 					<UniformGrid Columns="3"/>
@@ -24,7 +24,7 @@
 			<ListBox.ItemTemplate>
 				<DataTemplate>
 					<Border Background="#374151" Margin="2" CornerRadius="4">
-						<TextBlock Margin="10,10,0,0" Foreground="White" Text="{Binding BlockName}"></TextBlock>
+						<TextBlock Margin="10,10,0,0" Foreground="White" Text="{Binding UserName}"></TextBlock>
 					</Border>
 					
 					</DataTemplate>
