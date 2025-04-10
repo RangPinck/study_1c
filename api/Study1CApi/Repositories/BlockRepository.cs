@@ -35,7 +35,6 @@ namespace Study1CApi.Repositories
 
         public async Task<bool> AddBlockAsync(AddBlockDTO newBlock)
         {
-
             var course = await _context.CoursesBlocks.Where(x => x.Course == newBlock.Course).OrderByDescending(x => x.BlockNumberOfCourse).FirstOrDefaultAsync();
 
             int blockNumber = 0;

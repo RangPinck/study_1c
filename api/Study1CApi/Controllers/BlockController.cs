@@ -15,13 +15,11 @@ namespace Study1CApi.Controllers
     {
         private readonly IBlockRepository _blockRepository;
         private readonly ICourseRepository _courseRepository;
-        private readonly IUserRepository _userRepository;
         private readonly UserManager<AuthUser> _userManager;
 
-        public BlockController(IBlockRepository blockRepository, IUserRepository userRepository, ICourseRepository courseRepository, UserManager<AuthUser> userManager)
+        public BlockController(IBlockRepository blockRepository, ICourseRepository courseRepository, UserManager<AuthUser> userManager)
         {
             _blockRepository = blockRepository;
-            _userRepository = userRepository;
             _courseRepository = courseRepository;
             _userManager = userManager;
         }
