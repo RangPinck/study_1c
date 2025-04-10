@@ -69,6 +69,8 @@ public class Program
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IConnectionRepository, ConnectionRepository>();
+        builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+        builder.Services.AddScoped<IBlockRepository, BlockRepository>();
 
         builder.Services.AddIdentity<AuthUser, Role>(options =>
         {
@@ -148,9 +150,9 @@ public class Program
 
             try
             {
-                string adminName = builder.Configuration.GetValue<string>("StandartAdmin:Name");
-                string adminLogin = builder.Configuration.GetValue<string>("StandartAdmin:Login");
-                string adminPassword = builder.Configuration.GetValue<string>("StandartAdmin:Password");
+                string adminName = builder.Configuration.GetValue<string>("StandardAdmin:Name");
+                string adminLogin = builder.Configuration.GetValue<string>("StandardAdmin:Login");
+                string adminPassword = builder.Configuration.GetValue<string>("StandardAdmin:Password");
 
                 var userManager = service.GetRequiredService<UserManager<AuthUser>>();
                 var roleManager = service.GetRequiredService<RoleManager<Role>>();
@@ -166,7 +168,7 @@ public class Program
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex.ToString());
             }
         }
 
