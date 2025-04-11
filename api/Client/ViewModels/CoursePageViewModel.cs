@@ -4,30 +4,32 @@ using Newtonsoft.Json;
 using System.Threading.Tasks;
 using ReactiveUI;
 using Client.Models;
+using Client.Models.Courses;
 
 namespace Client.ViewModels
 {
 	public class CoursePageViewModel : ViewModelBase
 	{
 
-		private List<TestClass> _test = new();
+		private List<ShortCourseDTO> _courses = new();
 
-        public List<TestClass> Test { get => _test; set => this.RaiseAndSetIfChanged(ref _test, value); }
+        public List<ShortCourseDTO> Courses { get => _courses; set => this.RaiseAndSetIfChanged(ref _courses, value); }
        
 
         public CoursePageViewModel()
 		{
-			Test = new List<TestClass>();
-			Test.Add(new TestClass() { BlockId = "1", BlockName = "Test1"});
-            Test.Add(new TestClass() { BlockId = "2", BlockName = "Test2" });
-            Test.Add(new TestClass() { BlockId = "3", BlockName = "Test3" });
-            Test.Add(new TestClass() { BlockId = "4", BlockName = "Test4" });
-
+            GetCourses();
         }
 
         public void ToAddCourse()
         {
             MainWindowViewModel.Instance.PageContent = new AddEditCourse();
+        }
+
+        async Task GetCourses()
+        {
+            var response = await MainWindowViewModel.ApiClient.GetAllCourses(MainWindowViewModel.Instance.CurrentUser.Token);
+            Courses = JsonConvert.DeserializeObject<List<ShortCourseDTO>>(response);
         }
     }
 }

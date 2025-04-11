@@ -53,5 +53,15 @@ namespace Client.Models
 
             return responseBody;
         }
+
+        public async Task<string> GetAllCourses(string token)
+        {
+            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            HttpResponseMessage response = await Client.GetAsync("Course/GetAllCourses");
+
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            return responseBody;
+        }
     }
 }

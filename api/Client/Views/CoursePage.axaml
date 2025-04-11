@@ -15,11 +15,11 @@
 				<!-- Menu Icon -->
 				
 		</Grid>
-		<ListBox SelectionMode="Single" ItemsSource="{Binding Test}" Grid.Row="1" Background="White">
+		<ListBox SelectionMode="Single" ItemsSource="{Binding Courses}" Grid.Row="1" Background="White">
 			<ListBox.ItemTemplate>
 				<DataTemplate >
 					<Grid ColumnDefinitions="*,*" Background="#374151" Height="59">
-						<TextBlock VerticalAlignment="Center" Padding="40,0" Text="{Binding BlockName}" Foreground="White"></TextBlock>
+						<TextBlock VerticalAlignment="Center" Padding="40,0" Text="{Binding CourseName}" Foreground="White"></TextBlock>
 					</Grid>
 				</DataTemplate>
 			</ListBox.ItemTemplate>
