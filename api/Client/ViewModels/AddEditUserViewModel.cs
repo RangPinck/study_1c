@@ -6,5 +6,6 @@ namespace Client.ViewModels
 {
 	public class AddEditUserViewModel : ViewModelBase
 	{
+
 	}
 }

@@ -15,7 +15,8 @@
 			<!-- Menu Icon -->
 		</Grid>
 		<Grid Grid.Row="1" ColumnDefinitions="*,2*,*">
-			<StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+			<ScrollViewer>
+			<StackPanel Spacing="10" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
 				<TextBlock FontSize="16" Padding="0,20,10,10" >
 					Название Курса
 				</TextBlock>
@@ -37,7 +38,7 @@
 				<TextBlock FontSize="16" Padding="0,10,10,10" >
 					Автор
 				</TextBlock>
-				<ComboBox Width="325" Height="40" BorderBrush="#D28530" ItemsSource="{Binding CourseAutor}" SelectedIndex="{Binding AuthorIndex}">
+				<ComboBox Width="325" Height="40" BorderBrush="#D28530" ItemsSource="{Binding Users}" SelectedIndex="{Binding AuthorIndex}">
 					<ComboBox.ItemTemplate>
 						<DataTemplate>
 							<TextBlock>
@@ -53,10 +54,11 @@
 					</ComboBox.ItemTemplate>
 				</ComboBox>
 			</StackPanel>
+			</ScrollViewer>
 		</Grid>
 		<Grid Grid.Row="2">
 			<!-- Add Burron -->
-			<Button Background="#D28530" Width="157" Height="45" Padding="" HorizontalAlignment="Right" Foreground="White">
+			<Button Background="#D28530" Width="157" Height="45" Padding="" HorizontalAlignment="Right" Command="{Binding SaveData}" Foreground="White">
 				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16">Сохранить</TextBlock>
 			</Button>
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Client.Models.Account;
@@ -50,7 +51,8 @@ namespace Client.Models
 
         public async Task<string> GetAllUsers(string token)
         {
-            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+            Client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             HttpResponseMessage response = await Client.GetAsync("User/GetAllUsers");
             string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -59,7 +61,8 @@ namespace Client.Models
 
         public async Task<string> GetAllCourses(string token)
         {
-            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {MainWindowViewModel.Instance.CurrentUser.Token}");
+            Client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", MainWindowViewModel.Instance.CurrentUser.Token);
             HttpResponseMessage response = await Client.GetAsync("Course/GetAllCourses");
 
             string responseBody = await response.Content.ReadAsStringAsync();
@@ -69,7 +72,8 @@ namespace Client.Models
 
         public async Task<string> GetAuthors()
         {
-            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {MainWindowViewModel.Instance.CurrentUser.Token}");
+            Client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer",MainWindowViewModel.Instance.CurrentUser.Token);
             HttpResponseMessage response = await Client.GetAsync("Course/GetAuthorsForCourses");
             string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -78,11 +82,20 @@ namespace Client.Models
 
         public async Task<string> AddCourse(AddCourseDTO newCourse)
         {
-            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {MainWindowViewModel.Instance.CurrentUser.Token}");
+            Client.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", MainWindowViewModel.Instance.CurrentUser.Token);
             JsonContent newCourseSerialize = JsonContent.Create(newCourse);
             HttpResponseMessage responce = await Client.PostAsync("Course/AddCourse", newCourseSerialize);
             return await responce.Content.ReadAsStringAsync();
         }
 
+        public async Task<string> UpdateCourse(UpdateCourseDTO newCourse)
+        {
+            Client.DefaultRequestHeaders.Authorization =
+                        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", MainWindowViewModel.Instance.CurrentUser.Token);
+            JsonContent newCourseSerialize = JsonContent.Create(newCourse);
+            HttpResponseMessage responce = await Client.PutAsync("Course/UpdateCourse", newCourseSerialize);
+            return await responce.Content.ReadAsStringAsync();
+        }
     }
 }

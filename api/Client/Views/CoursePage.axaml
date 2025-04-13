@@ -16,10 +16,19 @@
 				
 		</Grid>
 		<ListBox SelectionMode="Single" ItemsSource="{Binding Courses}" Grid.Row="1" Background="White">
-			<ListBox.ItemTemplate>
-				<DataTemplate >
+			<ListBox.ItemTemplate>		
+				<DataTemplate>	
+				
 					<Grid ColumnDefinitions="*,*" Background="#374151" Height="59">
-						<TextBlock VerticalAlignment="Center" Padding="40,0" Text="{Binding CourseName}" Foreground="White"></TextBlock>
+						<StackPanel>
+							<ContextMenu>
+								<MenuItem Header="Редактировать" Command="{Binding $parent[UserControl].((vm:CoursePageViewModel)DataContext).EditCommand}" CommandParameter="{Binding}">
+									
+								</MenuItem>
+							</ContextMenu>
+							<TextBlock VerticalAlignment="Center" Padding="40,0" Text="{Binding CourseName}" Foreground="White"></TextBlock>
+
+						</StackPanel>
 					</Grid>
 				</DataTemplate>
 			</ListBox.ItemTemplate>

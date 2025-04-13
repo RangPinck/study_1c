@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ReactiveUI;
 using Client.Models;
 using Client.Models.Courses;
+using System.Reactive;
 
 namespace Client.ViewModels
 {
@@ -14,7 +15,7 @@ namespace Client.ViewModels
 		private List<ShortCourseDTO> _courses = new();
 
         public List<ShortCourseDTO> Courses { get => _courses; set => this.RaiseAndSetIfChanged(ref _courses, value); }
-       
+
 
         public CoursePageViewModel()
 		{
@@ -30,6 +31,11 @@ namespace Client.ViewModels
         {
             var response = await MainWindowViewModel.ApiClient.GetAllCourses(MainWindowViewModel.Instance.CurrentUser.Token);
             Courses = JsonConvert.DeserializeObject<List<ShortCourseDTO>>(response);
+        }
+
+        public void EditCommand(ShortCourseDTO Item)
+        {
+            MainWindowViewModel.Instance.PageContent = new AddEditCourse(Item);
         }
     }
 }
