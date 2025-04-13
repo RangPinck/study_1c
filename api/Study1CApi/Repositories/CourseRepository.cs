@@ -27,6 +27,7 @@ namespace Study1CApi.Repositories
                 CourseName = x.CourseName,
                 CourseDataCreate = x.CourseDataCreate,
                 Description = x.Description,
+                Link = x.Link,
                 Author = new AuthorOfCourseDTO()
                 {
                     UserSurname = x.AuthorNavigation.UserSurname,

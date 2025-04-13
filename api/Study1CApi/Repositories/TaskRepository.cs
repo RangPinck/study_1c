@@ -16,7 +16,8 @@ namespace Study1CApi.Repositories
 
         public async Task<IEnumerable<TaskDTO>> GetTasksOfBlockIdAsync(Guid blockId, Guid userId)
         {
-            return await _context.BlocksTasks.AsNoTracking().Where(x => x.Block == blockId).Select(x => new TaskDTO()
+
+            var tasks = await _context.BlocksTasks.AsNoTracking().Where(x => x.Block == blockId).Select(x => new TaskDTO()
             {
                 TaskId = x.TaskId,
                 TaskName = x.TaskName,
@@ -26,6 +27,10 @@ namespace Study1CApi.Repositories
                 TaskNumberOfBlock = x.TaskNumberOfBlock,
                 Description = x.Description
             }).ToListAsync();
+
+            var usersConfirmedTask = await _context.UsersTasks.AsNoTracking().Where(task => task.AuthUser == userId).ToListAsync();
+
+            return new List<TaskDTO>();
         }
 
         public async Task<IEnumerable<StudyStateDTO>> GetStudyStatesAsync()
