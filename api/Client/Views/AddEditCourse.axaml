@@ -19,25 +19,39 @@
 				<TextBlock FontSize="16" Padding="0,20,10,10" >
 					Название Курса
 				</TextBlock>
-				<TextBox Width="325" Height="40" BorderBrush="#D28530">
+				<TextBox Width="325" Height="40" BorderBrush="#D28530" Text="{Binding CourseFull.Title}">
 
 				</TextBox>
-				<TextBlock FontSize="16" Padding="0,10,10,10" >
+				<TextBlock FontSize="16" Padding="0,10,10,10">
 					Ссылка
 				</TextBlock>
-				<TextBox Width="325" Height="40" BorderBrush="#D28530">
+				<TextBox Width="325" Height="40" BorderBrush="#D28530"  Text="{Binding CourseFull.Link}">
 
 				</TextBox>
 				<TextBlock FontSize="16" Padding="0,10,10,10" >
 					Описание
 				</TextBlock>
-				<TextBox Width="325" Height="107" BorderBrush="#D28530" >
+				<TextBox Width="325" Height="107" BorderBrush="#D28530" Text="{Binding CourseFull.Description}">
 
 				</TextBox>
 				<TextBlock FontSize="16" Padding="0,10,10,10" >
 					Автор
 				</TextBlock>
-				<ComboBox Width="325" Height="40" BorderBrush="#D28530"></ComboBox>
+				<ComboBox Width="325" Height="40" BorderBrush="#D28530" ItemsSource="{Binding CourseAutor}" SelectedIndex="{Binding AuthorIndex}">
+					<ComboBox.ItemTemplate>
+						<DataTemplate>
+							<TextBlock>
+								<TextBlock.Text>
+									<MultiBinding StringFormat="{}{0} {1} {2}">
+										<Binding Path="UserSurname"></Binding>
+										<Binding Path="UserName"></Binding>
+										<Binding Path="UserPatronymic"></Binding>
+									</MultiBinding>
+								</TextBlock.Text>
+							</TextBlock>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
 			</StackPanel>
 		</Grid>
 		<Grid Grid.Row="2">
