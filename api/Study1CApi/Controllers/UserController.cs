@@ -39,7 +39,7 @@ namespace Study1CApi.Controllers
                 var currentUser = _userManager.FindByEmailAsync(loginUser.Identity.Name).Result;
                 var userRoles = _userManager.GetRolesAsync(currentUser).Result.ToList();
 
-                var users = await _userRepository.GetAllUsers(userRoles.Contains("Администратор"));
+                var users = await _userRepository.GetAllUsersAsync(userRoles.Contains("Администратор"));
 
                 if (!ModelState.IsValid)
                 {

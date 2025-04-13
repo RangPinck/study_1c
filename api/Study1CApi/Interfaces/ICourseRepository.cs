@@ -4,32 +4,34 @@ namespace Study1CApi.Interfaces
 {
     public interface ICourseRepository
     {
-        public Task<IEnumerable<ShortCourseDTO>> GetAllCourses();
+        public Task<IEnumerable<ShortCourseDTO>> GetAllCoursesAsync();
 
-        public Task<FullCourseDTO> GetCourseById(Guid courseId);
+        public Task<FullCourseDTO> GetCourseByIdAsync(Guid courseId);
 
-        public Task<bool> AddCourse(AddCourseDTO newCourse);
+        public Task<bool> AddCourseAsync(AddCourseDTO newCourse);
 
-        public Task<bool> UpdateCourse(UpdateCourseDTO updatedCourse);
+        public Task<bool> UpdateCourseAsync(UpdateCourseDTO updatedCourse);
 
         public Task<bool> SaveChangesAsync();
 
-        public Task<bool> CourseComparisonByAuthorAndTitle(Guid authorId, string courseTitle);
+        public Task<bool> CourseComparisonByAuthorAndTitleAsync(Guid authorId, string courseTitle);
 
-        public Task<StandardCourseDTO> GetCourseDataById(Guid courseId);
+        public Task<StandardCourseDTO> GetCourseDataByIdAsync(Guid courseId);
 
-        public Task<bool> DeleteCourse(Guid courseId);
+        public Task<bool> DeleteCourseAsync(Guid courseId);
 
-        public Task<bool> CheckSubsOnCourse(Guid courseId);
+        public Task<bool> CheckSubsOnCourseAsync(Guid courseId);
 
-        public Task<bool> SubscribeUserForACourse(SubscribeUserCourseDTO  suc);
+        public Task<bool> SubscribeUserForACourseAsync(SubscribeUserCourseDTO  suc);
 
-        public Task<bool> UnsubscribeUserForACourse(SubscribeUserCourseDTO suc);
+        public Task<bool> UnsubscribeUserForACourseAsync(SubscribeUserCourseDTO suc);
 
-        public Task<bool> CheckUserSubscribeOnCourse(SubscribeUserCourseDTO suc);
+        public Task<bool> CheckUserSubscribeOnCourseAsync(SubscribeUserCourseDTO suc);
 
-        public Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserSubscribe(Guid userId);
+        public Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserSubscribeAsync(Guid userId);
 
-        public Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserCreate(Guid authorId);
+        public Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserCreateAsync(Guid authorId);
+
+        public Task<bool> CourseIsExistByIdAsync(Guid courseId);
     }
 }

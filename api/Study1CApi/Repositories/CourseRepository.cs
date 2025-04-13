@@ -19,7 +19,7 @@ namespace Study1CApi.Repositories
             _userManager = userManager;
         }
 
-        public async Task<IEnumerable<ShortCourseDTO>> GetAllCourses()
+        public async Task<IEnumerable<ShortCourseDTO>> GetAllCoursesAsync()
         {
             return await _context.Courses.AsNoTracking().Select(x => new ShortCourseDTO()
             {
@@ -37,7 +37,7 @@ namespace Study1CApi.Repositories
             }).ToListAsync();
         }
 
-        public async Task<FullCourseDTO> GetCourseById(Guid courseId)
+        public async Task<FullCourseDTO> GetCourseByIdAsync(Guid courseId)
         {
             return await _context.Courses.AsNoTracking().Select(course => new FullCourseDTO()
             {
@@ -63,12 +63,12 @@ namespace Study1CApi.Repositories
             }).FirstOrDefaultAsync(x => x.CourseId == courseId);
         }
 
-        public async Task<bool> AddCourse(AddCourseDTO newCourse)
+        public async Task<bool> AddCourseAsync(AddCourseDTO newCourse)
         {
             var course = new Course()
             {
                 CourseName = newCourse.Title,
-                CourseDataCreate = DateTime.UtcNow.AddHours(3),
+                CourseDataCreate = DateTime.UtcNow,
                 Description = newCourse.Description,
                 Link = newCourse.Link,
                 Author = newCourse.Author
@@ -85,12 +85,12 @@ namespace Study1CApi.Repositories
             return save > 0;
         }
 
-        public async Task<bool> CourseComparisonByAuthorAndTitle(Guid authorId, string courseTitle)
+        public async Task<bool> CourseComparisonByAuthorAndTitleAsync(Guid authorId, string courseTitle)
         {
             return await _context.Courses.AnyAsync(x => x.CourseName == courseTitle && x.Author == authorId);
         }
 
-        public async Task<bool> UpdateCourse(UpdateCourseDTO updatedCourse)
+        public async Task<bool> UpdateCourseAsync(UpdateCourseDTO updatedCourse)
         {
             var course = await _context.Courses.FirstOrDefaultAsync(x => x.CourseId == updatedCourse.CourseId);
 
@@ -108,7 +108,7 @@ namespace Study1CApi.Repositories
             return await SaveChangesAsync();
         }
 
-        public async Task<StandardCourseDTO> GetCourseDataById(Guid courseId)
+        public async Task<StandardCourseDTO> GetCourseDataByIdAsync(Guid courseId)
         {
             var course = await _context.Courses.AsNoTracking().Select(x => new StandardCourseDTO()
             {
@@ -122,19 +122,19 @@ namespace Study1CApi.Repositories
             return course;
         }
 
-        public async Task<bool> DeleteCourse(Guid courseId)
+        public async Task<bool> DeleteCourseAsync(Guid courseId)
         {
             var course = await _context.Courses.FirstOrDefaultAsync(x => x.CourseId == courseId);
             _context.Courses.Remove(course);
             return await SaveChangesAsync();
         }
 
-        public async Task<bool> CheckSubsOnCourse(Guid courseId)
+        public async Task<bool> CheckSubsOnCourseAsync(Guid courseId)
         {
             return await _context.UserCourses.AnyAsync(x => x.CourseId == courseId);
         }
 
-        public async Task<bool> SubscribeUserForACourse(SubscribeUserCourseDTO suc)
+        public async Task<bool> SubscribeUserForACourseAsync(SubscribeUserCourseDTO suc)
         {
             await _context.UserCourses.AddAsync(new UserCourse()
             {
@@ -145,14 +145,14 @@ namespace Study1CApi.Repositories
             return await SaveChangesAsync();
         }
 
-        public async Task<bool> UnsubscribeUserForACourse(SubscribeUserCourseDTO suc)
+        public async Task<bool> UnsubscribeUserForACourseAsync(SubscribeUserCourseDTO suc)
         {
             var uc = await _context.UserCourses.FirstOrDefaultAsync(x => x.CourseId == suc.courseId && x.UserId == suc.userId);
             _context.UserCourses.Remove(uc);
             return await SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserSubscribe(Guid userId)
+        public async Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserSubscribeAsync(Guid userId)
         {
             List<Guid> listSubscribleCourses = await _context.UserCourses.Where(x => x.UserId == userId).Select(x => x.CourseId).ToListAsync();
 
@@ -172,7 +172,7 @@ namespace Study1CApi.Repositories
             }).ToListAsync();
         }
 
-        public async Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserCreate(Guid authorId)
+        public async Task<IEnumerable<ShortCourseDTO>> GetCoursesThatUserCreateAsync(Guid authorId)
         {
             return await _context.Courses.AsNoTracking().Where(x => x.Author == authorId).Select(x => new ShortCourseDTO()
             {
@@ -190,9 +190,14 @@ namespace Study1CApi.Repositories
             }).ToListAsync();
         }
 
-        public async Task<bool> CheckUserSubscribeOnCourse(SubscribeUserCourseDTO suc)
+        public async Task<bool> CheckUserSubscribeOnCourseAsync(SubscribeUserCourseDTO suc)
         {
             return await _context.UserCourses.AnyAsync(x => x.UserId == suc.userId && suc.courseId == x.CourseId);
+        }
+
+        public async Task<bool> CourseIsExistByIdAsync(Guid courseId)
+        {
+            return await _context.Courses.AnyAsync(x => x.CourseId == courseId);
         }
     }
 }

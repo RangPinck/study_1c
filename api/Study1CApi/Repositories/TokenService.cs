@@ -21,24 +21,24 @@ namespace Study1CApi.Repositories
         public string CreateToken(AuthUser user, string role)
         {
             var claims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Name, user.Email),
-            new Claim(JwtRegisteredClaimNames.GivenName, user.UserName),
-            new Claim(ClaimTypes.Role, role),
-            new Claim(ClaimTypes.Name, user.Email),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email)
-        };
+            {
+                new Claim(JwtRegisteredClaimNames.Name, user.Email),
+                new Claim(JwtRegisteredClaimNames.GivenName, user.UserName),
+                new Claim(ClaimTypes.Role, role),
+                new Claim(ClaimTypes.Name, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddMinutes(20), //токен на * период
+                Expires = DateTime.Now.AddMinutes(_config.GetValue<double>("JWT:TokenValidMinutes")),
                 SigningCredentials = creds,
                 Issuer = _config["JWT:Issuer"],
-                Audience = _config["JWT:Audience"]
+                Audience = _config["JWT:Audience"],
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();

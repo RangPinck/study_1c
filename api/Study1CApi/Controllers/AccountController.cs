@@ -33,6 +33,51 @@ namespace Study1CApi.Controllers
             _account = account;
         }
 
+        [SwaggerOperation(Summary = "Авторизация в системе")]
+        [HttpPost("Login")]
+        [AllowAnonymous]
+        [ProducesResponseType(200, Type = typeof(SignInDTO))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> Login(LoginDTO loginDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var appUser = await _userManager.FindByEmailAsync(loginDto.Email);
+
+                if (appUser == null) return Unauthorized("There is no such user in the database!");
+
+                var result = await _signInManager.CheckPasswordSignInAsync(appUser, loginDto.Password, false);
+
+                if (!result.Succeeded) return Unauthorized("Incorrect password!");
+
+                var userRole = await _userManager.GetRolesAsync(appUser);
+
+                var user = _context.Users.AsNoTracking().FirstOrDefault(u => u.UserId == appUser.Id);
+
+                SignInDTO profile = new SignInDTO()
+                {
+                    Id = user.UserId,
+                    Email = loginDto.Email,
+                    UserSurname = user.UserSurname,
+                    UserName = user.UserName,
+                    UserPatronymic = user.UserPatronymic,
+                    UserRole = userRole.ToList(),
+                    IsFirst = user.IsFirst,
+                    Token = _tokenService.CreateToken(appUser, userRole.First())
+                };
+
+                return Ok(profile);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
         [SwaggerOperation(Summary = "Создание пользователя")]
         [HttpPost("Register")]
         [Authorize(Roles = "Администратор, Куратор")]
@@ -54,7 +99,7 @@ namespace Study1CApi.Controllers
                     Email = registerDto.Email,
                     UserName = registerDto.Email.ToLower(),
                     EmailConfirmed = true,
-                    UserDataCreate = DateTime.UtcNow.AddHours(3),
+                    UserDataCreate = DateTime.UtcNow,
                 };
 
                 var createdUser = await _userManager.CreateAsync(appUser, registerDto.Password);
@@ -122,101 +167,6 @@ namespace Study1CApi.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Авторизация в системе")]
-        [HttpPost("Login")]
-        [AllowAnonymous]
-        [ProducesResponseType(200, Type = typeof(SignInDTO))]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> Login(LoginDTO loginDto)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var appUser = await _userManager.FindByEmailAsync(loginDto.Email);
-
-                if (appUser == null) return Unauthorized("There is no such user in the database!");
-
-                var result = await _signInManager.CheckPasswordSignInAsync(appUser, loginDto.Password, false);
-
-                if (!result.Succeeded) return Unauthorized("Incorrect password!");
-
-                var userRole = await _userManager.GetRolesAsync(appUser);
-
-                var user = _context.Users.AsNoTracking().FirstOrDefault(u => u.UserId == appUser.Id);
-
-                SignInDTO profile = new SignInDTO()
-                {
-                    Id = user.UserId,
-                    Email = loginDto.Email,
-                    UserSurname = user.UserSurname,
-                    UserName = user.UserName,
-                    UserPatronymic = user.UserPatronymic,
-                    UserRole = userRole.ToList(),
-                    IsFirst = user.IsFirst,
-                    Token = _tokenService.CreateToken(appUser, userRole.First())
-                };
-
-                return Ok(profile);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
-
-        [SwaggerOperation(Summary = "Удаление пользователя")]
-        [HttpDelete("DeleteAccount")]
-        [Authorize]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> DeleteAccount(DeleteAccountDTO deleteUser)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var loginUser = await _userManager.FindByIdAsync(deleteUser.UserId.ToString());
-
-                if (loginUser == null) return Unauthorized("The user is not logged in!");
-
-                var appUser = await _userManager.FindByIdAsync(deleteUser.UserIdWillBeDelete.ToString());
-
-                if (appUser == null) return BadRequest("There is no such user in the database!");
-
-                var listLoginUserRoles = _userManager.GetRolesAsync(loginUser).Result.ToList();
-                var listAppUserRoles = _userManager.GetRolesAsync(appUser).Result.ToList();
-
-                if (listAppUserRoles.Any(x => x == "Администратор") && !listLoginUserRoles.Any(x => x == "Администратор"))
-                {
-                    return BadRequest("You don't have enough rights for this operation!");
-                }
-
-                if (_userManager.GetUsersInRoleAsync("Администратор").Result.ToList().Count == 1 &&
-                    _userManager.GetRolesAsync(appUser).Result.Any(x => x == "Администратор"))
-                {
-                    return BadRequest("You cannot delete the last administrator!");
-                }
-
-                if (appUser == loginUser || listLoginUserRoles.Any(x => x == "Администратор"))
-                {
-                    var result = await _userManager.DeleteAsync(appUser);
-
-                    if (!result.Succeeded) return BadRequest("The operation failed!");
-                }
-
-                return Ok("The user has been deleted!");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-        }
-
         [SwaggerOperation(Summary = "Обновление профиля пользователя")]
         [HttpPut("UpdateProfile")]
         [Authorize]
@@ -240,13 +190,13 @@ namespace Study1CApi.Controllers
 
                 if (authUser.Id == updateUser.UserId)
                 {
-                    if (await _account.UpdateUserProfile(updateUser))
+                    if (await _account.UpdateUserProfileAsync(updateUser))
                     {
                         var result = await _userManager.SetEmailAsync(authUser, updateUser.Email);
                         authUser.NormalizedEmail = updateUser.Email.ToUpper();
                         authUser.UserName = updateUser.UserName + " " + updateUser.UserName + " " + updateUser.UserPatronymic;
                         authUser.NormalizedUserName = authUser.UserName.ToUpper();
-                        authUser.ConcurrencyStamp =DateTime.UtcNow.AddHours(3).ToString();
+                        authUser.ConcurrencyStamp = DateTime.UtcNow.ToString();
                         result = await _userManager.UpdateAsync(authUser);
 
                         if (!result.Succeeded) return BadRequest("Incorrect data!");
@@ -268,7 +218,7 @@ namespace Study1CApi.Controllers
                             return BadRequest("You don't have enough rights for this operation!");
                         }
 
-                        if (await _account.UpdateUserProfile(updateUser))
+                        if (await _account.UpdateUserProfileAsync(updateUser))
                         {
                             var result = await _userManager.SetEmailAsync(userWillBeUpdate, updateUser.Email);
 
@@ -277,7 +227,7 @@ namespace Study1CApi.Controllers
                             userWillBeUpdate.NormalizedEmail = updateUser.Email.ToUpper();
                             userWillBeUpdate.UserName = updateUser.Email.ToLower();
                             userWillBeUpdate.NormalizedUserName = updateUser.Email.ToUpper();
-                            userWillBeUpdate.ConcurrencyStamp = DateTime.UtcNow.AddHours(3).ToString();
+                            userWillBeUpdate.ConcurrencyStamp = DateTime.UtcNow.ToString();
                             result = await _userManager.UpdateAsync(userWillBeUpdate);
 
                             if (!result.Succeeded) return BadRequest("Incorrect data!");
@@ -410,9 +360,58 @@ namespace Study1CApi.Controllers
 
                 if (appUser == null) return BadRequest("There is no such user in the database!");
 
-                if (!await _account.RegistrationUserFirstLogin(appUser.Id)) return BadRequest("Incorrect data!");
+                if (!await _account.RegistrationUserFirstLoginAsync(appUser.Id)) return BadRequest("Incorrect data!");
 
                 return Ok("The user is logged in!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [SwaggerOperation(Summary = "Удаление пользователя")]
+        [HttpDelete("DeleteAccount")]
+        [Authorize]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<IActionResult> DeleteAccount(DeleteAccountDTO deleteUser)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var appUser = await _userManager.FindByIdAsync(deleteUser.UserId.ToString());
+
+                if (appUser == null) return BadRequest("There is no such user in the database!");
+
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+
+                var listAppUserRoles = _userManager.GetRolesAsync(appUser).Result.ToList();
+
+                if (listAppUserRoles.Contains("Администратор") && !authUserRoles.Contains("Администратор"))
+                {
+                    return BadRequest("You don't have enough rights for this operation!");
+                }
+
+                if (_userManager.GetUsersInRoleAsync("Администратор").Result.ToList().Count == 1 &&
+                    _userManager.GetRolesAsync(appUser).Result.Any(x => x == "Администратор"))
+                {
+                    return BadRequest("You cannot delete the last administrator!");
+                }
+
+                if (appUser == authUser || authUserRoles.Contains("Администратор"))
+                {
+                    var result = await _userManager.DeleteAsync(appUser);
+
+                    if (!result.Succeeded) return BadRequest("The operation failed!");
+                }
+
+                return Ok("The user has been deleted!");
             }
             catch (Exception ex)
             {

@@ -17,7 +17,7 @@ namespace Study1CApi.Repositories
             _userManager = userManager;
         }
 
-        public async Task<ICollection<UserDTO>> GetAllUsers(bool isAdmin = false)
+        public async Task<ICollection<UserDTO>> GetAllUsersAsync(bool isAdmin = false)
         {
             try
             {
@@ -59,12 +59,12 @@ namespace Study1CApi.Repositories
             }
         }
 
-        public async Task<bool> UserIsExist(Guid userId)
+        public async Task<bool> UserIsExistAsync(Guid userId)
         {
             return await _context.Users.AnyAsync(x => x.UserId == userId);
         }
 
-        public async Task<IEnumerable<CourseAuthorDTO>> GetAuthorsForCourses()
+        public async Task<IEnumerable<CourseAuthorDTO>> GetAuthorsForCoursesAsync()
         {
             List<Guid> users = _userManager.GetUsersInRoleAsync("Администратор").Result.Select(x => x.Id).ToList();
             users = [.. users, .. _userManager.GetUsersInRoleAsync("Куратор").Result.Select(x => x.Id).Distinct().ToList()];

@@ -23,7 +23,7 @@ namespace Study1CApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> CheckConnection()
         {
-            var connection = await _connectionRepository.CheckConnectionAsync();
+            var connection = await _connectionRepository.CheckConnectionAsyncAsync();
 
             if (connection.IsConnect == ConnectionEnum.Connect){
                 return Ok("Database is connected!");
