@@ -14,9 +14,9 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-	<SplitView  IsPaneOpen="{Binding IsPaneOpen}" OpenPaneLength="500" Background="White" PanePlacement="Right" PaneBackground="White" DisplayMode="CompactInline" CornerRadius="15">
+	<SplitView IsPaneOpen="{Binding IsPaneOpen}" OpenPaneLength="500" Background="White" PanePlacement="Right" PaneBackground="White" DisplayMode="CompactInline" CornerRadius="15">
 		<SplitView.Pane>
-			<Border Background="#374151">
+			<Border Background="#374151" IsVisible="{Binding PaneVisibility}">
 				<StackPanel Orientation="Vertical" 
                   Spacing="15"
                   HorizontalAlignment="Stretch"

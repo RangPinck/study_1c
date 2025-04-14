@@ -6,9 +6,17 @@
 			 xmlns:vm="using:Client.ViewModels"
 			 x:DataType="vm:AuthPageViewModel"
              x:Class="Client.AuthPage">
-	<Grid>
-		<StackPanel>
-	<TextBlock FontSize="16" Padding="0,20,10,10" >
+	<Grid RowDefinitions="70, *, 50">
+		<Grid Grid.Row="0" Background="#D28530">
+			<!-- Courses Title -->
+			<Border CornerRadius="5" Background="White" Padding="20" Height="44" Width="292" Margin="20,35,0,0" HorizontalAlignment="Left">
+				<TextBlock Text="Авторизация" FontSize="20" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			</Border>
+			<!-- Menu Icon -->
+
+		</Grid>
+		<StackPanel Grid.Row="1" HorizontalAlignment="Center">
+	<TextBlock FontSize="16" Padding="0,20,10,10"  >
 		Email
 	</TextBlock>
 	<TextBox Width="325" Height="40" BorderBrush="#D28530" Text="{Binding Email}">
@@ -20,7 +28,7 @@
 
 	</TextBox>
 		</StackPanel>
-		<Button Grid.Row="2" Width="152" Height="44" Background="#D28530" Grid.Column="1" FontSize="20" HorizontalContentAlignment="Center"
+		<Button Grid.Row="2" Width="182" Height="54" Background="#D28530" Grid.Column="1" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="30" HorizontalContentAlignment="Center"
         VerticalContentAlignment="Center"  Content="Вход" Foreground="White" CornerRadius="7" Command="{Binding Authorize}"></Button>
 	</Grid>
 </UserControl>

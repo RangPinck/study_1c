@@ -15,26 +15,34 @@
 			<!-- Menu Icon -->
 		</Grid>
 		<Grid Grid.Row="1" ColumnDefinitions="*,2*,*">
-			<ScrollViewer>
-			<StackPanel Spacing="10" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+			<ScrollViewer Grid.Column="1" >
+			<StackPanel Spacing="15"  VerticalAlignment="Center" HorizontalAlignment="Center" >
+				<StackPanel Height="80">
 				<TextBlock FontSize="16" Padding="0,20,10,10" >
 					Название Курса
 				</TextBlock>
-				<TextBox Width="325" Height="40" BorderBrush="#D28530" Text="{Binding CourseFull.Title}">
+				<TextBox Width="325" Height="55" BorderBrush="#D28530" Text="{Binding CourseFull.Title}">
 
 				</TextBox>
+				</StackPanel>
+				<StackPanel Height="80">
 				<TextBlock FontSize="16" Padding="0,10,10,10">
 					Ссылка
 				</TextBlock>
 				<TextBox Width="325" Height="40" BorderBrush="#D28530"  Text="{Binding CourseFull.Link}">
 
 				</TextBox>
-				<TextBlock FontSize="16" Padding="0,10,10,10" >
+
+				</StackPanel>
+				<StackPanel Height="157">
+					<TextBlock FontSize="16" Padding="0,10,10,10" >
 					Описание
 				</TextBlock>
 				<TextBox Width="325" Height="107" BorderBrush="#D28530" Text="{Binding CourseFull.Description}">
 
 				</TextBox>
+				</StackPanel>
+				<StackPanel Height="80">
 				<TextBlock FontSize="16" Padding="0,10,10,10" >
 					Автор
 				</TextBlock>
@@ -53,6 +61,7 @@
 						</DataTemplate>
 					</ComboBox.ItemTemplate>
 				</ComboBox>
+				</StackPanel>
 			</StackPanel>
 			</ScrollViewer>
 		</Grid>

@@ -19,6 +19,7 @@ namespace Client.ViewModels
 
         public CoursePageViewModel()
 		{
+            MainWindowViewModel.Instance.PaneVisibility = true;
             GetCourses();
         }
 

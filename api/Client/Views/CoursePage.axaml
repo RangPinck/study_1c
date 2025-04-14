@@ -17,20 +17,52 @@
 		</Grid>
 		<ListBox SelectionMode="Single" ItemsSource="{Binding Courses}" Grid.Row="1" Background="White">
 			<ListBox.ItemTemplate>		
-				<DataTemplate>	
-				
-					<Grid ColumnDefinitions="*,*" Background="#374151" Height="59">
-						<StackPanel>
+				<DataTemplate>
+					<StackPanel>
+						<StackPanel.ContextMenu>
 							<ContextMenu>
 								<MenuItem Header="Редактировать" Command="{Binding $parent[UserControl].((vm:CoursePageViewModel)DataContext).EditCommand}" CommandParameter="{Binding}">
-									
+								</MenuItem>
+								<MenuItem Header="Удалить" Command="{}" CommandParameter="{Binding}">
 								</MenuItem>
 							</ContextMenu>
-							<TextBlock VerticalAlignment="Center" Padding="40,0" Text="{Binding CourseName}" Foreground="White"></TextBlock>
+						</StackPanel.ContextMenu>
 
-						</StackPanel>
+				
+					<Grid RowDefinitions="*,*" ColumnDefinitions="*, 60" Background="#374151" Height="59">
+						<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" FontSize="20" Padding="40,0" Text="{Binding CourseName}" Foreground="White"></TextBlock>
+						<TextBlock Grid.Row="1" Grid.Column="0" Padding="40,0" VerticalAlignment="Center" FontSize="14" Foreground="White" > 
+							<TextBlock.Text>
+								<MultiBinding StringFormat="Автор: {0} {1} {2}">
+									<Binding Path="Author.UserSurname"></Binding>
+									<Binding Path="Author.UserName"></Binding>
+									<Binding Path="Author.UserPatronymic"></Binding>
+								</MultiBinding>
+							</TextBlock.Text>
+						</TextBlock>
+
+						<Button Grid.Column="1" Grid.RowSpan="2" Padding="0,0,10,0" Width="40" Height="40" Background="Transparent" BorderThickness="0">
+							<Path Name="chevron"
+							 Data="M 10,0 L 20,20 30,0"
+							 Stroke="White"
+							 StrokeThickness="3"
+							 StrokeLineCap="Round"
+							 Stretch="Uniform">
+								<Path.RenderTransform>
+									<!-- Отзеркаливание по горизонтали + увеличение -->
+									<TransformGroup>
+										<ScaleTransform ScaleX="1" ScaleY="1"/>
+										<ScaleTransform ScaleX="1.9" ScaleY="1.9"/>
+										<RotateTransform Angle="-90"/>
+									</TransformGroup>
+								</Path.RenderTransform>
+							</Path>
+						</Button>
+						
 					</Grid>
+					</StackPanel>
 				</DataTemplate>
+				
 			</ListBox.ItemTemplate>
 		</ListBox>
 				<Grid Grid.Row="2">

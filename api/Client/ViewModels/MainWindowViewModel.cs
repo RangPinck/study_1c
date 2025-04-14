@@ -16,6 +16,7 @@ namespace Client.ViewModels
 
         UserResponse currentUser = new UserResponse();
 
+        private bool _paneVisibility = false;
 
 
         private UserControl _pageContent = new AuthPage();
@@ -34,6 +35,7 @@ namespace Client.ViewModels
         public UserControl PageContent { get => _pageContent; set => this.RaiseAndSetIfChanged(ref _pageContent, value); }
         public bool IsPaneOpen { get => _isPaneOpen; set => this.RaiseAndSetIfChanged(ref _isPaneOpen, value); }
         public UserResponse CurrentUser { get => currentUser; set => this.RaiseAndSetIfChanged(ref currentUser, value); }
+        public bool PaneVisibility { get => _paneVisibility; set => this.RaiseAndSetIfChanged(ref _paneVisibility, value); }
 
         private bool _isPaneOpen = false;
         public void PaneState()
