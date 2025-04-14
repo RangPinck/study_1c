@@ -6,6 +6,8 @@ namespace Study1CApi.Interfaces
     {
         public Task<IEnumerable<MaterialTypeDTO>> GetMaterialsTypesAsync();
 
+        public Task<MaterialDTO> GetMaterialByIdAsync(Guid materialId, Guid userId);
+
         public Task<IEnumerable<MaterialDTO>> GetMaterialsAsync(Guid userId, Guid blockId, int materialTypeId);
 
         public Task<bool> AddMaterialAsync(AddMaterialDTO newMaterial);
@@ -20,8 +22,8 @@ namespace Study1CApi.Interfaces
 
         public Task<Guid?> GetAuthorOfCourseByBlocklIdAsync(Guid blockId);
 
-        public Task<bool> MaterialTypeComparisonById(int materialTypeId);
+        public Task<bool> MaterialTypeComparisonByIdAsync(int materialTypeId);
 
-        public Task<MaterialShortDTO> GetMaterialDataById(Guid materialId);
+        public Task<MaterialShortDTO> GetMaterialDataByIdAsync(Guid materialId);
     }
 }
