@@ -159,3 +159,32 @@
   "description": "Описание"
 }
 
+Создавние материала:
+{
+  "materialName": "Учебник",
+  "link": "",
+  "typeId": 1,
+  "description": "Учебник",
+  "duration": 100,
+  "block": "27c7f513-82d2-49ea-a494-b797bb15d7f5"
+}
+
+{
+  "materialName": "Н",
+  "link": "",
+  "typeId": 2,
+  "description": "Учебник",
+  "duration": -1,
+  "block": "27c7f513-82d2-49ea-a494-b797bb15d7f5"
+}
+
+
+обновление материала:
+{
+  "materialId": "8b9739bf-4526-4f2a-9cdc-18b57fb2264b",
+  "materialName": "Учебник2",
+  "link": "Учебник2",
+  "typeId": 2,
+  "description": "Учебник2",
+  "duration": 100
+}

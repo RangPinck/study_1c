@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Study1CApi.DTOs.MaterialDTOs
 {
     public class MaterialDTO
@@ -23,8 +18,14 @@ namespace Study1CApi.DTOs.MaterialDTOs
 
         public int Status { get; set; }
 
-        public int? DurationMaterial { get; set; } = 0;
+        public int? DurationNeeded { get; set; } = 0;
 
         public DateTime? DateStart { get; set; }
+
+        public int? Duration { get; set; }
+
+        public string? Note { get; set; }
+
+        public DateTime BmDateCreate { get; set; }
     }
 }

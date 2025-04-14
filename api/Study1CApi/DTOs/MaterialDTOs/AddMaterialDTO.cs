@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Study1CApi.DTOs.MaterialDTOs
 {
     public class AddMaterialDTO
@@ -13,8 +8,12 @@ namespace Study1CApi.DTOs.MaterialDTOs
 
         public int TypeId { get; set; }
 
-        public string TypeName { get; set; } = null!;
-
         public string? Description { get; set; }
+
+        public int? Duration { get; set; }
+
+        public Guid Block { get; set; }
+
+        public string? Note { get; set; }
     }
 }

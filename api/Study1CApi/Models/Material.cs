@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Study1CApi.Models;
+﻿namespace Study1CApi.Models;
 
 public partial class Material
 {
