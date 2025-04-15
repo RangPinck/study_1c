@@ -16,10 +16,12 @@ namespace Study1CApi.Controllers
     {
         private readonly IMaterialRepository _materialRepository;
         private readonly UserManager<AuthUser> _userManager;
+        private readonly IBlockRepository _blockRepository;
 
-        public MaterialController(IMaterialRepository materialRepository, UserManager<AuthUser> userManager)
+        public MaterialController(IMaterialRepository materialRepository, UserManager<AuthUser> userManager, IBlockRepository blockRepository)
         {
             _userManager = userManager;
+            _blockRepository = blockRepository;
             _materialRepository = materialRepository;
         }
 
@@ -91,7 +93,7 @@ namespace Study1CApi.Controllers
                 var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
                 var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
 
-                var material  = await _materialRepository.GetMaterialByIdAsync(materialId, authUser.Id);
+                var material = await _materialRepository.GetMaterialByIdAsync(materialId, authUser.Id);
 
                 if (!ModelState.IsValid)
                 {
@@ -153,6 +155,70 @@ namespace Study1CApi.Controllers
                 {
                     return BadRequest("This material doesn't add to database. No correct data.");
                 }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
+
+        [SwaggerOperation(Summary = "Добавление блоку материала")]
+        [HttpPost("AddMaterialToBlock")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> AddMaterialToBlock(MaterialToBlockDTO newBm)
+        {
+            try
+            {
+                var oldMaterial = await _materialRepository.GetMaterialDataByIdAsync(newBm.Material);
+
+                if (oldMaterial == null)
+                {
+                    return BadRequest("Material not found!");
+                }
+
+                if (!await _blockRepository.BlockIsExistByIdAsync(newBm.Block))
+                {
+                    return BadRequest("This block not found.");
+                }
+
+                if (newBm.Duration <= 0)
+                {
+                    return BadRequest("The study time cannot be less than or equal to zero!");
+                }
+
+                if (await _materialRepository.CheckExistsMaterailOfBlocAsync(newBm.Block, newBm.Material))
+                {
+                    return BadRequest("The block already has this material!");
+                }
+
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+
+                if (!authUserRoles.Contains("Администратор"))
+                {
+                    var author = await _materialRepository.GetAuthorOfCourseByBlocklIdAsync(newBm.Block);
+                    if (author != null || authUser.Id != author)
+                    {
+                        return BadRequest("You don't have enough rights for this operation!");
+                    }
+                }
+
+                if (!await _materialRepository.AddMaterialToBlockAsync(newBm))
+                {
+                    return BadRequest("This row doesn't add to database. No correct data.");
+                }
+
 
                 if (!ModelState.IsValid)
                 {
@@ -229,6 +295,69 @@ namespace Study1CApi.Controllers
             }
         }
 
+        [SwaggerOperation(Summary = "Обновление материала блока")]
+        [HttpPut("UpdateMaterialBlock")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> UpdateMaterialBlock(MaterialToBlockDTO bm)
+        {
+            try
+            {
+                var oldMaterial = await _materialRepository.GetMaterialDataByIdAsync(bm.Material);
+
+                if (oldMaterial == null)
+                {
+                    return BadRequest("Material not found!");
+                }
+
+                if (!await _blockRepository.BlockIsExistByIdAsync(bm.Block))
+                {
+                    return BadRequest("This block not found.");
+                }
+
+                if (bm.Duration <= 0)
+                {
+                    return BadRequest("The study time cannot be less than or equal to zero!");
+                }
+
+                if (!await _materialRepository.CheckExistsMaterailOfBlocAsync(bm.Block, bm.Material))
+                {
+                    return BadRequest("The block with this material not found!");
+                }
+
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+
+                if (!authUserRoles.Contains("Администратор"))
+                {
+                    var author = await _materialRepository.GetAuthorOfCourseByBlocklIdAsync(bm.Block);
+                    if (author != null || authUser.Id != author)
+                    {
+                        return BadRequest("You don't have enough rights for this operation!");
+                    }
+                }
+
+                if (!await _materialRepository.UpdateMaterialToBlockAsync(bm))
+                {
+                    return BadRequest("This row doesn't update on database. No correct data.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
+
         [SwaggerOperation(Summary = "Удаление материала")]
         [HttpDelete("DeleteMaterial")]
         [ProducesResponseType(204)]
@@ -259,6 +388,59 @@ namespace Study1CApi.Controllers
                 }
 
                 if (!await _materialRepository.DeleteMaterialAsync(materialId))
+                {
+                    return BadRequest("This material doesn't delete. No correct data.");
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
+
+                return Ok("Operation success");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, ex.Message);
+            }
+        }
+
+        [SwaggerOperation(Summary = "Удаление материала у блока")]
+        [HttpDelete("DeleteMaterialOfBlock")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        [Authorize(Roles = "Администратор, Куратор")]
+        public async Task<IActionResult> DeleteMaterialOfBlock(Guid blockId, Guid materialId)
+        {
+            try
+            {
+                var oldMaterial = await _materialRepository.GetMaterialDataByIdAsync(materialId);
+
+                if (oldMaterial == null || !await _blockRepository.BlockIsExistByIdAsync(blockId))
+                {
+                    return BadRequest("Row with this data not found!");
+                }
+
+                if (!await _materialRepository.CheckExistsMaterailOfBlocAsync(blockId, materialId))
+                {
+                    return BadRequest("The block with this material not found!");
+                }
+
+                var httpUser = HttpContext.User;
+                var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
+
+                if (!authUserRoles.Contains("Администратор"))
+                {
+                    var author = await _materialRepository.GetAuthorOfCourseByBlocklIdAsync(blockId);
+                    if (author != null || authUser.Id != author)
+                    {
+                        return BadRequest("You don't have enough rights for this operation!");
+                    }
+                }
+
+                if (!await _materialRepository.DeleteMaterialToBlockAsync(blockId, materialId))
                 {
                     return BadRequest("This material doesn't delete. No correct data.");
                 }

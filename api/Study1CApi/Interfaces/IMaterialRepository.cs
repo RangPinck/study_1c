@@ -25,5 +25,13 @@ namespace Study1CApi.Interfaces
         public Task<bool> MaterialTypeComparisonByIdAsync(int materialTypeId);
 
         public Task<MaterialShortDTO> GetMaterialDataByIdAsync(Guid materialId);
+
+        public Task<bool> AddMaterialToBlockAsync(MaterialToBlockDTO mb);
+
+        public Task<bool> CheckExistsMaterailOfBlocAsync(Guid blockId, Guid materialId);
+
+        public Task<bool> UpdateMaterialToBlockAsync(MaterialToBlockDTO mb);
+
+        public Task<bool> DeleteMaterialToBlockAsync(Guid blockId, Guid materialId);
     }
 }

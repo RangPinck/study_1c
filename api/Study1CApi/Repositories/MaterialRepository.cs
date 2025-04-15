@@ -37,9 +37,9 @@ namespace Study1CApi.Repositories
                 DurationNeeded = material.Duration,
                 Note = material.Note,
                 BmDateCreate = material.BmDateCreate,
-                Status = material.UsersTasks.FirstOrDefault(user => user.AuthUser == userId).Status != null ? material.UsersTasks.FirstOrDefault(user => user.AuthUser == userId).Status : 1,
-                Duration = material.UsersTasks.FirstOrDefault(user => user.AuthUser == userId).DurationMaterial != null ? material.UsersTasks.FirstOrDefault(user => user.AuthUser == userId).DurationMaterial : 0,
-                DateStart = material.UsersTasks.FirstOrDefault(user => user.AuthUser == userId).DateStart,
+                Status = material.UsersTasks.FirstOrDefault(ut => ut.AuthUser == userId && ut.Material == material.MaterialNavigation.MaterialId) != null ? material.UsersTasks.FirstOrDefault(ut => ut.AuthUser == userId && ut.Material == material.MaterialNavigation.MaterialId).Status : 1,
+                Duration = material.UsersTasks.FirstOrDefault(ut => ut.AuthUser == userId && ut.Material == material.MaterialNavigation.MaterialId) != null ? material.UsersTasks.FirstOrDefault(ut => ut.AuthUser == userId && ut.Material == material.MaterialNavigation.MaterialId).DurationMaterial : 0,
+                DateStart = material.UsersTasks.FirstOrDefault(ut => ut.AuthUser == userId && ut.Material == material.MaterialNavigation.MaterialId).DateStart,
             }).ToListAsync();
         }
 
@@ -57,9 +57,9 @@ namespace Study1CApi.Repositories
                 DurationNeeded = material.Duration,
                 Note = material.Note,
                 BmDateCreate = material.BmDateCreate,
-                Status = material.UsersTasks.FirstOrDefault(user => user.AuthUser == userId).Status != null ? material.UsersTasks.FirstOrDefault(user => user.AuthUser == userId).Status : 1,
-                Duration = material.UsersTasks.FirstOrDefault(user => user.AuthUser == userId).DurationMaterial != null ? material.UsersTasks.FirstOrDefault(user => user.AuthUser == userId).DurationMaterial : 0,
-                DateStart = material.UsersTasks.FirstOrDefault(user => user.AuthUser == userId).DateStart,
+                Status = material.UsersTasks.FirstOrDefault(ut => ut.AuthUser == userId && ut.Material == material.MaterialNavigation.MaterialId).Status != null ? material.UsersTasks.FirstOrDefault(ut => ut.AuthUser == userId && ut.Material == material.MaterialNavigation.MaterialId).Status : 1,
+                Duration = material.UsersTasks.FirstOrDefault(ut => ut.AuthUser == userId && ut.Material == material.MaterialNavigation.MaterialId).DurationMaterial != null ? material.UsersTasks.FirstOrDefault(ut => ut.AuthUser == userId && ut.Material == material.MaterialNavigation.MaterialId).DurationMaterial : 0,
+                DateStart = material.UsersTasks.FirstOrDefault(ut => ut.AuthUser == userId && ut.Material == material.MaterialNavigation.MaterialId).DateStart,
             }).FirstOrDefaultAsync(x => x.MaterialId == materialId);
         }
 
@@ -81,7 +81,7 @@ namespace Study1CApi.Repositories
             };
 
             _context.Materials.Attach(material);
-            _context.Materials.Add(material);
+            await _context.Materials.AddAsync(material);
 
             return await SaveChangesAsync();
         }
@@ -142,6 +142,48 @@ namespace Study1CApi.Repositories
                 MaterialId = material.MaterialNavigation.MaterialId,
                 Author = material.BlockNavigation.CourseNavigation.Author,
             }).FirstOrDefaultAsync(x => x.MaterialId == materialId);
+        }
+
+        public async Task<bool> AddMaterialToBlockAsync(MaterialToBlockDTO mb)
+        {
+            var newBm = new BlocksMaterial()
+            {
+                Block = mb.Block,
+                Material = mb.Material,
+                BmDateCreate = DateTime.UtcNow,
+                Note = mb.Note,
+                Duration = mb.Duration
+            };
+
+            await _context.BlocksMaterials.AddAsync(newBm);
+
+            return await SaveChangesAsync();
+        }
+
+        public async Task<bool> CheckExistsMaterailOfBlocAsync(Guid blockId, Guid materialId)
+        {
+            return await _context.BlocksMaterials.AnyAsync(x => x.Block == blockId && materialId == x.Material);
+        }
+
+        public async Task<bool> UpdateMaterialToBlockAsync(MaterialToBlockDTO mb)
+        {
+            var bm = await _context.BlocksMaterials.FirstOrDefaultAsync(x => x.Block == mb.Block && mb.Material == x.Material);
+
+            bm.Duration = mb.Duration;
+            bm.Note = mb.Note;
+
+            _context.BlocksMaterials.Update(bm);
+
+            return await SaveChangesAsync();
+        }
+
+        public async Task<bool> DeleteMaterialToBlockAsync(Guid blockId, Guid materialId)
+        {
+            var bm = await _context.BlocksMaterials.FirstOrDefaultAsync(x => x.Block == blockId && materialId == x.Material);
+
+            _context.BlocksMaterials.Remove(bm);
+
+            return await SaveChangesAsync();
         }
     }
 }

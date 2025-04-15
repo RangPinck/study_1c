@@ -2,7 +2,6 @@
 using Study1CApi.DTOs.TaskDTOs;
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
-
 namespace Study1CApi.Repositories
 {
     public class TaskRepository : ITaskRepository
@@ -16,21 +15,20 @@ namespace Study1CApi.Repositories
 
         public async Task<IEnumerable<TaskDTO>> GetTasksOfBlockIdAsync(Guid blockId, Guid userId)
         {
-
-            var tasks = await _context.BlocksTasks.AsNoTracking().Where(x => x.Block == blockId).Select(x => new TaskDTO()
+            return await _context.BlocksTasks.AsNoTracking().Where(task => task.Block == blockId).Select(task => new TaskDTO()
             {
-                TaskId = x.TaskId,
-                TaskName = x.TaskName,
-                TaskDateCreated = x.TaskDateCreated,
-                Duration = x.Duration,
-                Link = x.Link,
-                TaskNumberOfBlock = x.TaskNumberOfBlock,
-                Description = x.Description
+                TaskId = task.TaskId,
+                TaskName = task.TaskName,
+                TaskDateCreated = task.TaskDateCreated,
+                DurationNeeded = task.Duration,
+                Link = task.Link,
+                TaskNumberOfBlock = task.TaskNumberOfBlock,
+                Description = task.Description,
+                Status = task.UsersTasks.FirstOrDefault(ut => userId == ut.AuthUser && ut.Task == task.TaskId) != null ? task.UsersTasks.FirstOrDefault(ut => userId == ut.AuthUser && ut.Task == task.TaskId).Status : 1,
+                DateStart = task.UsersTasks.FirstOrDefault(ut => userId == ut.AuthUser && ut.Task == task.TaskId).DateStart,
+                Duration = task.UsersTasks.FirstOrDefault(ut => userId == ut.AuthUser && ut.Task == task.TaskId) != null ? task.UsersTasks.FirstOrDefault(ut => userId == ut.AuthUser && ut.Task == task.TaskId).DurationTask : 0,
+
             }).ToListAsync();
-
-            var usersConfirmedTask = await _context.UsersTasks.AsNoTracking().Where(task => task.AuthUser == userId).ToListAsync();
-
-            return new List<TaskDTO>();
         }
 
         public async Task<IEnumerable<StudyStateDTO>> GetStudyStatesAsync()
@@ -40,11 +38,6 @@ namespace Study1CApi.Repositories
                 StateId = x.StateId,
                 StateName = x.StateName
             }).ToListAsync();
-        }
-
-        public async Task<bool> UpdateTaskStateAsync(Guid taskId, int stateId)
-        {
-            return await SaveChangesAsync();
         }
 
         public async Task<bool> UpdateTaskAsync()

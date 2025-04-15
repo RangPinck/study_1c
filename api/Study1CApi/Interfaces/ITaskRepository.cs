@@ -8,8 +8,6 @@ namespace Study1CApi.Interfaces
 
         public Task<IEnumerable<StudyStateDTO>> GetStudyStatesAsync();
 
-        public Task<bool> UpdateTaskStateAsync(Guid taskId, int stateId);
-
         public Task<bool> UpdateTaskAsync();
 
         public Task<bool> DeleteTaskAsync(Guid taskId);

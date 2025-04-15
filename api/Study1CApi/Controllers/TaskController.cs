@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Study1CApi.DTOs.MaterialDTOs;
 using Study1CApi.DTOs.TaskDTOs;
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
@@ -11,13 +10,13 @@ namespace Study1CApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class BlockDataController : ControllerBase
+    public class TaskController : ControllerBase
     {
         
         private readonly ITaskRepository _taskRepository;
         private readonly UserManager<AuthUser> _userManager;
 
-        public BlockDataController(IMaterialRepository materialRepository, ITaskRepository taskRepository, UserManager<AuthUser> userManager)
+        public TaskController(IMaterialRepository materialRepository, ITaskRepository taskRepository, UserManager<AuthUser> userManager)
         {
             _taskRepository = taskRepository;
             _userManager = userManager;
