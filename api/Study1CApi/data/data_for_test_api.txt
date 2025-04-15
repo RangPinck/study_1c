@@ -188,3 +188,21 @@
   "description": "Учебник2",
   "duration": 100
 }
+
+добавление задачи:
+{
+  "taskName": "задача",
+  "duration": 10,
+  "block": "2acc63f9-a297-4f90-a0b8-2ffddbdfb3f2",
+  "link": "",
+  "description": ""
+}
+
+измененение задачи:
+{
+  "taskId": "2eb16604-5100-4eb3-94c9-6650c4cce27f",
+  "taskName": "string",
+  "duration": 1000,
+  "link": "string",
+  "description": "string"
+}
