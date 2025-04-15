@@ -97,5 +97,15 @@ namespace Client.Models
             HttpResponseMessage responce = await Client.PutAsync("Course/UpdateCourse", newCourseSerialize);
             return await responce.Content.ReadAsStringAsync();
         }
+
+        public async Task<string> GetCourses(ShortCourseDTO courseInfo)
+        {
+            Client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", MainWindowViewModel.Instance.CurrentUser.Token);
+            HttpResponseMessage response = await Client.GetAsync($"Block/GetBlockOfCourse?courseId={courseInfo.CourseId}");
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            return responseBody;
+        }
     }
 }

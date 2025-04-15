@@ -23,7 +23,7 @@
 			</ListBox.ItemsPanel>
 			<ListBox.ItemTemplate>
 				<DataTemplate>
-					<Border Background="#374151" Height="170" Width="170" Margin="2" CornerRadius="4">
+					<Border Background="#374151" Height="220" Width="220" Margin="2" CornerRadius="4">
 						<StackPanel Spacing="10"  Orientation="Vertical">
 							<TextBlock Padding="10,20" FontSize="14" Foreground="White" >
 								<TextBlock.Text>

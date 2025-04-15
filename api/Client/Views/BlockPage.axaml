@@ -3,8 +3,54 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:vm="using:Client.ViewModels"
+			 x:DataType="vm:BlockPageViewModel"
              x:Class="Client.BlockPage">
-	<Grid>
-		
+	<Grid RowDefinitions="70, *, 50">
+		<Grid Grid.Row="0" Background="#D28530">
+			<!-- Courses Title -->
+			<Border CornerRadius="5" Background="White" Padding="20" Height="44" Width="292" Margin="20,35,0,0" HorizontalAlignment="Left">
+				<TextBlock Text="Курсы" FontSize="20" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			</Border>
+			<!-- Menu Icon -->
+
+		</Grid>
+		<ListBox SelectionMode="Single" ItemsSource="{Binding}" Grid.Row="1" Background="White">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<StackPanel>
+						<Grid RowDefinitions="*,*" ColumnDefinitions="*, 60" Background="#374151" Height="59">
+							<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" FontSize="20" Padding="40,0" Text="{Binding}" Foreground="White"></TextBlock>
+
+							<Button Grid.Column="1" Grid.RowSpan="2" Padding="0,0,10,0" Width="40" Height="40" Background="Transparent" BorderThickness="0">
+								<Path Name="chevron"
+								 Data="M 10,0 L 20,20 30,0"
+								 Stroke="White"
+								 StrokeThickness="3"
+								 StrokeLineCap="Round"
+								 Stretch="Uniform">
+									<Path.RenderTransform>
+										<!-- Отзеркаливание по горизонтали + увеличение -->
+										<TransformGroup>
+											<ScaleTransform ScaleX="1" ScaleY="1"/>
+											<ScaleTransform ScaleX="1.9" ScaleY="1.9"/>
+											<RotateTransform Angle="-90"/>
+										</TransformGroup>
+									</Path.RenderTransform>
+								</Path>
+							</Button>
+
+						</Grid>
+					</StackPanel>
+				</DataTemplate>
+
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<Grid Grid.Row="2">
+			<!-- Add Burron -->
+			<Button Background="#D28530" Width="157" Height="45" HorizontalAlignment="Right" Foreground="White" Margin="30, 0" Command="{Binding}">
+				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" >Добавить курс</TextBlock>
+			</Button>
+		</Grid>
 	</Grid>
 </UserControl>
