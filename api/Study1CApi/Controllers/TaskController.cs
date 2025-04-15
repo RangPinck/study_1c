@@ -26,31 +26,6 @@ namespace Study1CApi.Controllers
             _userManager = userManager;
         }
 
-        [SwaggerOperation(Summary = "Получение статусов задач")]
-        [HttpGet("GetStudyStatesAsync")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<StudyStateDTO>))]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-        [Authorize]
-        public async Task<IActionResult> GetStudyStatesAsync()
-        {
-            try
-            {
-                var studyStates = await _taskRepository.GetStudyStatesAsync();
-
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest();
-                }
-
-                return Ok(studyStates);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(503, ex.Message);
-            }
-        }
-
         [SwaggerOperation(Summary = "Получение задач")]
         [HttpGet("GetTasksOfBlockIdAsync")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<TaskDTO>))]

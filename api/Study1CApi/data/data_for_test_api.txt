@@ -206,3 +206,19 @@
   "link": "string",
   "description": "string"
 }
+
+добавление практики:
+{
+  "practiceName": "практика",
+  "duration": 100,
+  "link": "",
+  "task": "e744bfd1-a477-4d64-9918-9eb71b19bbb7"
+}
+
+обновление практики:
+{
+  "practiceId": "f84d67b1-e185-4877-be3a-e28bd59c5891",
+  "practiceName": "string",
+  "duration": 10,
+  "link": "string"
+}

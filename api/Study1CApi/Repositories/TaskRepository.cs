@@ -31,15 +31,6 @@ namespace Study1CApi.Repositories
             }).ToListAsync();
         }
 
-        public async Task<IEnumerable<StudyStateDTO>> GetStudyStatesAsync()
-        {
-            return await _context.StudyStates.AsNoTracking().Select(x => new StudyStateDTO()
-            {
-                StateId = x.StateId,
-                StateName = x.StateName
-            }).ToListAsync();
-        }
-
         public async Task<bool> UpdateTaskAsync(UpdateTaskDTO updateTask)
         {
             var task = await _context.BlocksTasks.FirstOrDefaultAsync(x => x.TaskId == updateTask.TaskId);

@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Study1CApi.DTOs.MaterialDTOs;
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
-using Study1CApi.Repositories;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Study1CApi.Controllers
