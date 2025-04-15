@@ -5,7 +5,6 @@ using Study1CApi.DTOs.MaterialDTOs;
 using Study1CApi.DTOs.TaskDTOs;
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
-using Study1CApi.Repositories;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Study1CApi.Controllers
