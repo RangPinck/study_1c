@@ -29,6 +29,13 @@
 	</TextBox>
 		</StackPanel>
 		<Button Grid.Row="2" Width="182" Height="54" Background="#D28530" Grid.Column="1" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="30" HorizontalContentAlignment="Center"
-        VerticalContentAlignment="Center"  Content="Вход" Foreground="White" CornerRadius="7" Command="{Binding Authorize}"></Button>
+        VerticalContentAlignment="Center"  Content="Вход" Foreground="White" CornerRadius="7" Command="{Binding Authorize}">
+			<Button.Styles>
+				<Style Selector="Button:pointerover /template/ ContentPresenter">
+					<Setter Property="TextBlock.Foreground" Value="White"/>
+					<Setter Property="Background" Value="#DDA364"/>
+				</Style>
+			</Button.Styles>
+		</Button>
 	</Grid>
 </UserControl>

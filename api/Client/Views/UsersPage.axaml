@@ -18,13 +18,47 @@
 		<ListBox Grid.Row="1" ItemsSource="{Binding Users}" Background="White">
 			<ListBox.ItemsPanel>
 				<ItemsPanelTemplate>
-					<UniformGrid Columns="3"/>
+					<WrapPanel Orientation="Horizontal"></WrapPanel>
 				</ItemsPanelTemplate>
 			</ListBox.ItemsPanel>
 			<ListBox.ItemTemplate>
 				<DataTemplate>
-					<Border Background="#374151" Margin="2" CornerRadius="4">
-						<TextBlock Margin="10,10,0,0" Foreground="White" Text="{Binding UserName}"></TextBlock>
+					<Border Background="#374151" Height="170" Width="170" Margin="2" CornerRadius="4">
+						<StackPanel Spacing="10"  Orientation="Vertical">
+							<TextBlock Padding="10,20" FontSize="14" Foreground="White" >
+								<TextBlock.Text>
+									<MultiBinding StringFormat="Имя: {0}">
+										<Binding Path="UserName"></Binding>
+									</MultiBinding>
+								</TextBlock.Text>
+							</TextBlock>
+							<TextBlock Padding="10,0" FontSize="14" Foreground="White" >
+								<TextBlock.Text>
+									<MultiBinding StringFormat="Фамилия : {0}">
+										<Binding Path="UserSurname"></Binding>
+									</MultiBinding>
+								</TextBlock.Text>
+							</TextBlock>
+							<TextBlock Padding="10,0" FontSize="14" Foreground="White" >
+								<TextBlock.Text>
+									<MultiBinding StringFormat="Отчество: {0}">
+										<Binding Path="UserPatronymic"></Binding>
+									</MultiBinding>
+								</TextBlock.Text>
+							</TextBlock>
+							<TextBlock Padding="10,0" FontSize="14" Foreground="White" >
+								<TextBlock.Text>
+									<MultiBinding StringFormat="Роль: {0}">
+										<Binding Path="UserRole[0]"></Binding>
+									</MultiBinding>
+								</TextBlock.Text>
+							</TextBlock>
+							<StackPanel Orientation="Vertical" Spacing="5">
+							<TextBlock Padding="10,0" Foreground="White">Дата создания</TextBlock>
+							<TextBlock Padding="10,0" FontSize="14" Foreground="White" VerticalAlignment="Center" Text="{Binding UserDataCreate}"> </TextBlock>
+								
+							</StackPanel>
+						</StackPanel>
 					</Border>
 					
 					</DataTemplate>

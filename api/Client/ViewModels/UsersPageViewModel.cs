@@ -16,6 +16,7 @@ namespace Client.ViewModels
 
         public List<UserDTO> Users { get => _users; set => this.RaiseAndSetIfChanged(ref _users, value); }
 
+
         public UsersPageViewModel()
         {
            
