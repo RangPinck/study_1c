@@ -21,21 +21,43 @@
                   Spacing="15"
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Top">
-					<Button Width="40" HorizontalAlignment="Right" Margin="0,0,4,0" Background="Gray" Command="{Binding PaneState}">
+					<StackPanel Spacing="5" Margin="4,20,4,0" Orientation="Horizontal">
+					<Button Width="40" HorizontalAlignment="Right"  Background="White" Command="{Binding PaneState}">
 						<Path Data="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" Fill="Black"/>
 						<!-- Hamburger Icon (SVG Path) -->
 					</Button>
-					<Button  Width="40" HorizontalAlignment="Right" Margin="0,20,4,0" Background="Gray" Command="{Binding ToCourses}">
-						<Path Data="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" Fill="Black"/>
-					</Button>
-					<Button Width="40" HorizontalAlignment="Right" Margin="0,0,4,0" Background="Gray" Command="{Binding ToStatistics}">
-						<Path Data="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7V10h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"
-							  Fill="Black"/>
-					</Button>
-					<Button Width="40" HorizontalAlignment="Right" Margin="0,0,4,0" Background="Gray" Command="{Binding ToUsers}">
-						<Path Data="M12 4c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zm0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"
-							  Fill="Black"/>
-					</Button>
+						</StackPanel>
+					<Border CornerRadius="5" Height="70" Background="White" Margin="4,20,4,0">
+						<Button  Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Center" Command="{Binding ToCourses}" >
+					<StackPanel Spacing="17"  Orientation="Horizontal" >
+						<PathIcon Data="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" Foreground="Black"/>
+						<TextBlock HorizontalAlignment="Right" Padding="0,0,10,0">Курсы</TextBlock>
+						</StackPanel>
+						</Button>
+					</Border>
+					
+					
+					<Border Height="70" CornerRadius="5" Background="White" Margin="4,0,4,0">
+						<Button HorizontalAlignment="Stretch" VerticalAlignment="Center"  Background="White" Command="{Binding ToStatistics}">
+					<StackPanel Spacing="17"  Orientation="Horizontal">
+
+						<PathIcon Data="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7V10h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" Foreground="Black"/>
+						<TextBlock HorizontalAlignment="Right" Padding="0,0,10,0">Статистика</TextBlock>
+						</StackPanel>
+						</Button>
+						</Border>
+					
+					
+					
+					<Border CornerRadius="5" Height="70" Background="White" Margin="4,0,4,0">
+						<Button HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="White" Command="{Binding ToUsers}">
+					<StackPanel Spacing="17"  Orientation="Horizontal">
+						<PathIcon Data="M12 4c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zm0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z"
+							  Foreground="Black"/>
+						<TextBlock HorizontalAlignment="Right" Padding="0,0,10,0">Пользователи</TextBlock>
+						</StackPanel>
+						</Button>
+					</Border>
 				</StackPanel>
 			
 			</Border>
