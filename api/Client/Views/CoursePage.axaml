@@ -31,7 +31,7 @@
 				
 					<Grid RowDefinitions="*,*" ColumnDefinitions="*, 60" Background="#374151" Height="59">
 						<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" FontSize="20" Padding="40,0" Text="{Binding CourseName}" Foreground="White"></TextBlock>
-						<TextBlock Grid.Row="1" Grid.Column="0" Padding="40,0" VerticalAlignment="Center" FontSize="14" Foreground="White" > 
+						<TextBlock Grid.Row="1" Grid.Column="0" Padding="40,0" VerticalAlignment="Center" FontSize="14" Foreground="White"> 
 							<TextBlock.Text>
 								<MultiBinding StringFormat="Автор: {0} {1} {2}">
 									<Binding Path="Author.UserSurname"></Binding>
@@ -41,7 +41,7 @@
 							</TextBlock.Text>
 						</TextBlock>
 
-						<Button Grid.Column="1" Grid.RowSpan="2" Padding="0,0,10,0" Width="40" Height="40" Background="Transparent" BorderThickness="0">
+						<Button Grid.Column="1" Grid.RowSpan="2" Padding="0,0,10,0" Width="40" Height="40" Background="Transparent" BorderThickness="0" Command="{Binding $parent[UserControl].((vm:CoursePageViewModel)DataContext).ToBlockOfCourses}" CommandParameter="{Binding}">
 							<Path Name="chevron"
 							 Data="M 10,0 L 20,20 30,0"
 							 Stroke="White"

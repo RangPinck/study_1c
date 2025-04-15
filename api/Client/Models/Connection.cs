@@ -98,7 +98,7 @@ namespace Client.Models
             return await responce.Content.ReadAsStringAsync();
         }
 
-        public async Task<string> GetCourses(ShortCourseDTO courseInfo)
+        public async Task<string> GetBlock(ShortCourseDTO courseInfo)
         {
             Client.DefaultRequestHeaders.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", MainWindowViewModel.Instance.CurrentUser.Token);

@@ -10,17 +10,17 @@
 		<Grid Grid.Row="0" Background="#D28530">
 			<!-- Courses Title -->
 			<Border CornerRadius="5" Background="White" Padding="20" Height="44" Width="292" Margin="20,35,0,0" HorizontalAlignment="Left">
-				<TextBlock Text="Курсы" FontSize="20" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+				<TextBlock Text="Блоки" FontSize="20" Height="25" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 			</Border>
 			<!-- Menu Icon -->
 
 		</Grid>
-		<ListBox SelectionMode="Single" ItemsSource="{Binding}" Grid.Row="1" Background="White">
+		<ListBox SelectionMode="Single" ItemsSource="{Binding Blocks}" Grid.Row="1" Background="White">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
 					<StackPanel>
 						<Grid RowDefinitions="*,*" ColumnDefinitions="*, 60" Background="#374151" Height="59">
-							<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" FontSize="20" Padding="40,0" Text="{Binding}" Foreground="White"></TextBlock>
+							<TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" FontSize="20" Padding="40,0" Text="{Binding BlockName}" Foreground="White"></TextBlock>
 
 							<Button Grid.Column="1" Grid.RowSpan="2" Padding="0,0,10,0" Width="40" Height="40" Background="Transparent" BorderThickness="0">
 								<Path Name="chevron"
@@ -46,11 +46,5 @@
 
 			</ListBox.ItemTemplate>
 		</ListBox>
-		<Grid Grid.Row="2">
-			<!-- Add Burron -->
-			<Button Background="#D28530" Width="157" Height="45" HorizontalAlignment="Right" Foreground="White" Margin="30, 0" Command="{Binding}">
-				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" >Добавить курс</TextBlock>
-			</Button>
-		</Grid>
 	</Grid>
 </UserControl>

@@ -38,5 +38,10 @@ namespace Client.ViewModels
         {
             MainWindowViewModel.Instance.PageContent = new AddEditCourse(Item);
         }
+
+        public void ToBlockOfCourses(ShortCourseDTO Item)
+        {
+            MainWindowViewModel.Instance.PageContent = new BlockPage(Item);
+        }
     }
 }

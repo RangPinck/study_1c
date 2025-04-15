@@ -66,9 +66,6 @@
 		</ListBox>
 		<Grid Grid.Row="2">
 			<!-- Add Burron -->
-			<Button Background="#D28530" Width="210" Height="45" HorizontalAlignment="Right" Foreground="White" Command="{Binding ToAddUser}" Margin="30, 0">
-				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" >Добавить пользователя</TextBlock>
-			</Button>
 
 		</Grid>
 	</Grid>

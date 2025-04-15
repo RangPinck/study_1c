@@ -24,11 +24,6 @@ namespace Client.ViewModels
 
         }
 
-        public void ToAddUser()
-        {
-            MainWindowViewModel.Instance.PageContent = new AddEditUser();
-        }
-
         async Task GetUsers()
         {
             var response = await MainWindowViewModel.ApiClient.GetAllUsers(MainWindowViewModel.Instance.CurrentUser.Token);
