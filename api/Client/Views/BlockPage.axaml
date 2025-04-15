@@ -39,9 +39,9 @@
 									</Path.RenderTransform>
 								</Path>
 							</Button>
-
 						</Grid>
 					</StackPanel>
+					
 				</DataTemplate>
 
 			</ListBox.ItemTemplate>
