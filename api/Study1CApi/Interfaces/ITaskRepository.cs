@@ -6,16 +6,18 @@ namespace Study1CApi.Interfaces
     {
         public Task<IEnumerable<TaskDTO>> GetTasksOfBlockIdAsync(Guid blockId, Guid userId);
 
-        public Task<IEnumerable<StudyStateDTO>> GetStudyStatesAsync();
-
-        public Task<bool> UpdateTaskStateAsync(Guid taskId, int stateId);
-
-        public Task<bool> UpdateTaskAsync();
+        public Task<bool> UpdateTaskAsync(UpdateTaskDTO updateTask);
 
         public Task<bool> DeleteTaskAsync(Guid taskId);
 
-        public Task<bool> AddTaskAsync();
+        public Task<bool> AddTaskAsync(AddTaskDTO newTask);
 
         public Task<bool> SaveChangesAsync();
+
+        public Task<TaskDTO> GetTaskByIdAsync(Guid taskId, Guid userId);
+
+        public Task<bool> TaskComparisonByTitleAndBlockAsync(string title, Guid blockId);
+
+        public Task<Guid> GetBlockIdByTaskIdAsync(Guid taskId);
     }
 }

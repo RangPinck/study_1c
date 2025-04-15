@@ -1,0 +1,224 @@
+Авторизация:
+
+админ:
+{
+  "email": "admin@admin.com",
+  "password": "admin1cdbapi"
+}
+
+куратор 1:
+{
+  "email": "curator@curator.com",
+  "password": "12345678"
+}
+
+куратор 2:
+{
+  "email": "curator2@curator2.com",
+  "password": "12345678"
+}
+
+ученик 1:
+{
+  "email": "student1@student1.com",
+  "password": "12345678"
+}
+
+ученик 2:
+{
+  "email": "student2@student2.com",
+  "password": "12345678"
+}
+
+Создание пользователя:
+
+Куратор 1:
+{
+  "isFirst": false,
+  "userSurname": "curator",
+  "userName": "curator",
+  "userPatronymic": "string",
+  "email": "curator@curator.com",
+  "password": "12345678",
+  "confirmPassword": "12345678",
+  "roleId": "c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"
+}
+
+Куратор 2:
+{
+  "isFirst": false,
+  "userSurname": "curator2",
+  "userName": "curator2",
+  "userPatronymic": "string",
+  "email": "curator2@curator2.com",
+  "password": "12345678",
+  "confirmPassword": "12345678",
+  "roleId": "c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"
+}
+
+Ученик 1:
+{
+  "isFirst": true,
+  "userSurname": "student1",
+  "userName": "student1",
+  "userPatronymic": "student1",
+  "email": "student1@student1.com",
+  "password": "12345678",
+  "confirmPassword": "12345678",
+  "roleId": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+}
+
+Ученик 2:
+{
+  "isFirst": true,
+  "userSurname": "student2",
+  "userName": "student2",
+  "userPatronymic": "",
+  "email": "student2@student2.com",
+  "password": "12345678",
+  "confirmPassword": "12345678",
+  "roleId": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+}
+
+Создание курса:
+
+Курс 1 от куратора 1:
+{
+  "title": "курс 1",
+  "description": "",
+  "link": "",
+  "author": "0196125a-2c3e-7bc4-8dd4-5eeeff3ebc2b"
+}
+
+Курс 2 от куратора 1:
+{
+  "title": "курс 2",
+  "description": "",
+  "link": "",
+  "author": "0196125a-2c3e-7bc4-8dd4-5eeeff3ebc2b"
+}
+
+Курс 1 от куратора 2:
+{
+  "title": "курс 1",
+  "description": "",
+  "link": "",
+  "author": "01961fdc-a407-7b39-ba77-d1e23b1ecb41"
+}
+
+Курс 2 от куратора 2:
+{
+  "title": "курс 2",
+  "description": "",
+  "link": "",
+  "author": "01961fdc-a407-7b39-ba77-d1e23b1ecb41"
+}
+
+Подписка пользователя на курс:
+
+Ученик 1 на курс 1 преподавателя 1:
+{
+  "userId": "01961fe3-3791-7abb-a5d2-9d02c8015de2",
+  "courseId": "b70280a2-570f-4a46-ae7f-2faac6dc9e50"
+}
+
+Ученик 2 на курс 2 преподавателя 1:
+{
+  "userId": "01961fe4-a1f1-7812-b56b-aa71c46762a5",
+  "courseId": "e17c71c7-932e-4569-9dcb-54162994e669"
+}
+
+Ученик 1 на курс 1 преподавателя 2:
+{
+  "userId": "01961fe3-3791-7abb-a5d2-9d02c8015de2",
+  "courseId": "c3b2bb9f-49a7-48a5-9a14-32db2579fc48"
+}
+
+Ученик 2 на курс 1 преподавателя 2:
+{
+  "userId": "01961fe4-a1f1-7812-b56b-aa71c46762a5",
+  "courseId": "c3b2bb9f-49a7-48a5-9a14-32db2579fc48"
+}
+
+Ученик 1 на курс администратора:
+{
+  "userId": "01961fe3-3791-7abb-a5d2-9d02c8015de2",
+  "courseId": "fc770add-779d-4be5-bcd7-8a51d706f6cc"
+}
+
+Ученик 2 на курс администратора:
+{
+  "userId": "01961fe4-a1f1-7812-b56b-aa71c46762a5",
+  "courseId": "fc770add-779d-4be5-bcd7-8a51d706f6cc"
+}
+
+Блок 1 курса 1 куратора 1:
+{
+  "blockName": "Введение",
+  "course": "b70280a2-570f-4a46-ae7f-2faac6dc9e50",
+  "description": "Описание"
+}
+
+Создавние материала:
+{
+  "materialName": "Учебник",
+  "link": "",
+  "typeId": 1,
+  "description": "Учебник",
+  "duration": 100,
+  "block": "27c7f513-82d2-49ea-a494-b797bb15d7f5"
+}
+
+{
+  "materialName": "Н",
+  "link": "",
+  "typeId": 2,
+  "description": "Учебник",
+  "duration": -1,
+  "block": "27c7f513-82d2-49ea-a494-b797bb15d7f5"
+}
+
+
+обновление материала:
+{
+  "materialId": "8b9739bf-4526-4f2a-9cdc-18b57fb2264b",
+  "materialName": "Учебник2",
+  "link": "Учебник2",
+  "typeId": 2,
+  "description": "Учебник2",
+  "duration": 100
+}
+
+добавление задачи:
+{
+  "taskName": "задача",
+  "duration": 10,
+  "block": "2acc63f9-a297-4f90-a0b8-2ffddbdfb3f2",
+  "link": "",
+  "description": ""
+}
+
+измененение задачи:
+{
+  "taskId": "2eb16604-5100-4eb3-94c9-6650c4cce27f",
+  "taskName": "string",
+  "duration": 1000,
+  "link": "string",
+  "description": "string"
+}
+
+добавление практики:
+{
+  "practiceName": "практика",
+  "duration": 100,
+  "link": "",
+  "task": "e744bfd1-a477-4d64-9918-9eb71b19bbb7"
+}
+
+обновление практики:
+{
+  "practiceId": "f84d67b1-e185-4877-be3a-e28bd59c5891",
+  "practiceName": "string",
+  "duration": 10,
+  "link": "string"
+}

@@ -72,6 +72,9 @@ public class Program
         builder.Services.AddScoped<ICourseRepository, CourseRepository>();
         builder.Services.AddScoped<IBlockRepository, BlockRepository>();
         builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+        builder.Services.AddScoped<IMaterialRepository, MaterialRepository>();
+        builder.Services.AddScoped<IPracticeRepository, PracticeRepository>();
+        builder.Services.AddScoped<IStatusStudyRepository, StatusStudyRepository>();
 
 
         builder.Services.AddIdentity<AuthUser, Role>(options =>

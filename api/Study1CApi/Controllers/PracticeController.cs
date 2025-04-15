@@ -1,38 +1,39 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Study1CApi.DTOs.MaterialDTOs;
-using Study1CApi.DTOs.TaskDTOs;
+using Study1CApi.DTOs.PracticeDTOs;
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
+using Study1CApi.Repositories;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Study1CApi.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    public class TaskController : ControllerBase
+    [ApiController]
+    public class PracticeController : ControllerBase
     {
-        private readonly IMaterialRepository _materialRepository;
+        private readonly IPracticeRepository _practiceRepository;
         private readonly ITaskRepository _taskRepository;
-        private readonly IBlockRepository _blockRepository;
+        private readonly IMaterialRepository _materialRepository;
         private readonly UserManager<AuthUser> _userManager;
 
-        public TaskController(IMaterialRepository materialRepository, ITaskRepository taskRepository, IBlockRepository blockRepository, UserManager<AuthUser> userManager)
+        public PracticeController(IPracticeRepository practiceRepository, ITaskRepository taskRepository, IMaterialRepository materialRepository, UserManager<AuthUser> userManager)
         {
-            _materialRepository = materialRepository;
-            _taskRepository = taskRepository;
-            _blockRepository = blockRepository;
+            _practiceRepository = practiceRepository;
+            this._taskRepository = taskRepository;
+            this._materialRepository = materialRepository;
             _userManager = userManager;
         }
 
-        [SwaggerOperation(Summary = "Получение задач")]
-        [HttpGet("GetTasksOfBlockIdAsync")]
-        [ProducesResponseType(200, Type = typeof(IEnumerable<TaskDTO>))]
+        [SwaggerOperation(Summary = "Получение парктик")]
+        [HttpGet("GetPractics")]
+        [ProducesResponseType(200, Type = typeof(IEnumerable<PracticeDTO>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize]
-        public async Task<IActionResult> GetTasksOfBlockId(Guid blockId)
+        public async Task<IActionResult> GetPractics(Guid blockId)
         {
             try
             {
@@ -40,14 +41,14 @@ namespace Study1CApi.Controllers
                 var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
                 var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
 
-                var tasks = await _taskRepository.GetTasksOfBlockIdAsync(blockId, authUser.Id);
+                var practics = await _practiceRepository.GetPracticsOfBlockIdAsync(blockId, authUser.Id);
 
                 if (!ModelState.IsValid)
                 {
                     return BadRequest();
                 }
 
-                return Ok(tasks);
+                return Ok(practics);
             }
             catch (Exception ex)
             {
@@ -55,13 +56,13 @@ namespace Study1CApi.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Получение задачи по Id")]
-        [HttpGet("GetTaskById")]
+        [SwaggerOperation(Summary = "Получение практики по Id")]
+        [HttpGet("GetPracticeById")]
         [ProducesResponseType(200, Type = typeof(MaterialDTO))]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize]
-        public async Task<IActionResult> GetTaskById(Guid taskId)
+        public async Task<IActionResult> GetPracticeById(Guid practiceId)
         {
             try
             {
@@ -69,7 +70,7 @@ namespace Study1CApi.Controllers
                 var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
                 var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
 
-                var material = await _taskRepository.GetTaskByIdAsync(taskId, authUser.Id);
+                var material = await _practiceRepository.GetPracticeByIdAsync(practiceId, authUser.Id);
 
                 if (!ModelState.IsValid)
                 {
@@ -84,52 +85,53 @@ namespace Study1CApi.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Добавление задачи")]
-        [HttpPost("AddTask")]
+        [SwaggerOperation(Summary = "Добавление парктики")]
+        [HttpPost("AddPractice")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize(Roles = "Администратор, Куратор")]
-        public async Task<IActionResult> AddTask(AddTaskDTO newTask)
+        public async Task<IActionResult> AddPractice(AddPracticeDTO newPractice)
         {
             try
             {
-                if (!await _blockRepository.BlockIsExistByIdAsync(newTask.Block))
+                if (await _practiceRepository.PracticeComparisonByTitleAndTaskAsync(newPractice.PracticeName, newPractice.Task))
                 {
-                    return BadRequest("This block not found.");
+                    return BadRequest("This practice already exist.");
                 }
 
-                if (string.IsNullOrEmpty(newTask.TaskName))
+                if (string.IsNullOrEmpty(newPractice.PracticeName))
                 {
-                    return BadRequest("A task cannot exist without title.");
+                    return BadRequest("A practice cannot exist without title.");
                 }
 
-                if (await _taskRepository.TaskComparisonByTitleAndBlockAsync(newTask.TaskName, newTask.Block))
-                {
-                    return BadRequest("This task already exist.");
-                }
-
-                if (newTask.Duration <= 0)
+                if (newPractice.Duration <= 0)
                 {
                     return BadRequest("The study time cannot be less than or equal to zero!");
                 }
 
                 var httpUser = HttpContext.User;
                 var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
+
+                if (await _taskRepository.GetTaskByIdAsync(newPractice.Task, authUser.Id) == null)
+                {
+                    return BadRequest("This task for practice does not exist!");
+                }
+
                 var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
 
                 if (!authUserRoles.Contains("Администратор"))
                 {
-                    var author = await _materialRepository.GetAuthorOfCourseByBlocklIdAsync(newTask.Block);
+                    var author = await _materialRepository.GetAuthorOfCourseByBlocklIdAsync(await _taskRepository.GetBlockIdByTaskIdAsync(newPractice.Task));
                     if (author != null || authUser.Id != author)
                     {
                         return BadRequest("You don't have enough rights for this operation!");
                     }
                 }
 
-                if (!await _taskRepository.AddTaskAsync(newTask))
+                if (!await _practiceRepository.AddPracticeAsync(newPractice))
                 {
-                    return BadRequest("This material doesn't add to database. No correct data.");
+                    return BadRequest("This practice doesn't add to database. No correct data.");
                 }
 
                 if (!ModelState.IsValid)
@@ -145,49 +147,50 @@ namespace Study1CApi.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Обновление задачи")]
-        [HttpPut("UpdateTask")]
+
+        [SwaggerOperation(Summary = "Обновление практики")]
+        [HttpPut("UpdateMaterial")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize(Roles = "Администратор, Куратор")]
-        public async Task<IActionResult> UpdateTask(UpdateTaskDTO updatedTask)
+        public async Task<IActionResult> UpdateMaterial(UpdatePracticeDTO updatedPractice)
         {
             try
             {
                 var httpUser = HttpContext.User;
                 var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
-                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
-                var task = await _taskRepository.GetTaskByIdAsync(updatedTask.TaskId, authUser.Id);
+                var practice = await _practiceRepository.GetPracticeByIdAsync(updatedPractice.PracticeId, authUser.Id);
 
-                if (task == null)
+                if (practice == null)
                 {
-                    return BadRequest("This task not found.");
+                    return BadRequest("Practice not found!");
                 }
 
-                if (string.IsNullOrEmpty(updatedTask.TaskName))
+                if (string.IsNullOrEmpty(updatedPractice.PracticeName))
                 {
-                    return BadRequest("A material cannot exist without title.");
+                    return BadRequest("A practice cannot exist without title.");
                 }
 
-                if (updatedTask.Duration <= 0)
+                if (updatedPractice.Duration <= 0)
                 {
                     return BadRequest("The study time cannot be less than or equal to zero!");
                 }
-
+                
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
 
                 if (!authUserRoles.Contains("Администратор"))
                 {
-                    var author = await _materialRepository.GetAuthorOfCourseByBlocklIdAsync(await _taskRepository.GetBlockIdByTaskIdAsync(updatedTask.TaskId));
+                    var author = await _materialRepository.GetAuthorOfCourseByBlocklIdAsync(await _taskRepository.GetBlockIdByTaskIdAsync(practice.Task));
                     if (author != null || authUser.Id != author)
                     {
                         return BadRequest("You don't have enough rights for this operation!");
                     }
                 }
 
-                if (!await _taskRepository.UpdateTaskAsync(updatedTask))
+                if (!await _practiceRepository.UpdatePracticeAsync(updatedPractice))
                 {
-                    return BadRequest("This task doesn't update on database. No correct data.");
+                    return BadRequest("This practice doesn't update on database. No correct data.");
                 }
 
                 if (!ModelState.IsValid)
@@ -203,38 +206,40 @@ namespace Study1CApi.Controllers
             }
         }
 
-        [SwaggerOperation(Summary = "Удаление задачи")]
-        [HttpDelete("DeleteTask")]
+
+        [SwaggerOperation(Summary = "Удаление практики")]
+        [HttpDelete("DeletePractice")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize(Roles = "Администратор, Куратор")]
-        public async Task<IActionResult> DeleteTask(Guid taskId)
+        public async Task<IActionResult> DeletePractice(Guid practiceId)
         {
             try
             {
                 var httpUser = HttpContext.User;
                 var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
-                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
-                var task = await _taskRepository.GetTaskByIdAsync(taskId, authUser.Id);
+                var practice = await _practiceRepository.GetPracticeByIdAsync(practiceId, authUser.Id);
 
-                if (task == null)
+                if (practice == null)
                 {
-                    return BadRequest("This task not found.");
+                    return BadRequest("Practice not found!");
                 }
+
+                var authUserRoles = _userManager.GetRolesAsync(authUser).Result.ToList();
 
                 if (!authUserRoles.Contains("Администратор"))
                 {
-                    var author = await _materialRepository.GetAuthorOfCourseByBlocklIdAsync(await _taskRepository.GetBlockIdByTaskIdAsync(taskId));
+                    var author = await _materialRepository.GetAuthorOfCourseByBlocklIdAsync(await _taskRepository.GetBlockIdByTaskIdAsync(practice.Task));
                     if (author != null || authUser.Id != author)
                     {
                         return BadRequest("You don't have enough rights for this operation!");
                     }
                 }
 
-                if (!await _taskRepository.DeleteTaskAsync(taskId))
+                if (!await _practiceRepository.DeletePracticeAsync(practiceId))
                 {
-                    return BadRequest("This task doesn't delete. No correct data.");
+                    return BadRequest("This material doesn't delete. No correct data.");
                 }
 
                 if (!ModelState.IsValid)
