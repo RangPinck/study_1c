@@ -15,5 +15,6 @@ namespace Client.Models.Users
         public string UserName { get; set; } = string.Empty;
 
         public string? UserPatronymic { get; set; }
+
     }
 }

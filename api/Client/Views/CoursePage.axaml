@@ -23,7 +23,7 @@
 							<ContextMenu>
 								<MenuItem Header="Редактировать" Command="{Binding $parent[UserControl].((vm:CoursePageViewModel)DataContext).EditCommand}" CommandParameter="{Binding}">
 								</MenuItem>
-								<MenuItem Header="Удалить" Command="{}" CommandParameter="{Binding}">
+								<MenuItem Header="Удалить" Command="{Binding $parent[UserControl].((vm:CoursePageViewModel)DataContext).DeleteCommand}" CommandParameter="{Binding}">
 								</MenuItem>
 							</ContextMenu>
 						</StackPanel.ContextMenu>
@@ -67,8 +67,14 @@
 		</ListBox>
 				<Grid Grid.Row="2">
 					<!-- Add Burron -->
-					<Button Background="#D28530" Width="157" Height="45" HorizontalAlignment="Right" Foreground="White" Margin="30, 0" Command="{Binding ToAddCourse}">
+					<Button Background="#D28530" Width="157" Height="45" HorizontalAlignment="Right" Foreground="White" Margin="30,0,0 10" Command="{Binding ToAddCourse}">
 						<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" >Добавить курс</TextBlock>
+						<Button.Styles>
+							<Style Selector="Button:pointerover /template/ ContentPresenter">
+								<Setter Property="TextBlock.Foreground" Value="White"/>
+								<Setter Property="Background" Value="#DDA364"/>
+							</Style>
+						</Button.Styles>
 					</Button>
 				</Grid>
 		</Grid>

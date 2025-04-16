@@ -6,6 +6,7 @@ using ReactiveUI;
 using Client.Models;
 using Client.Models.Courses;
 using System.Reactive;
+using MsBox.Avalonia;
 
 namespace Client.ViewModels
 {
@@ -34,9 +35,23 @@ namespace Client.ViewModels
             Courses = JsonConvert.DeserializeObject<List<ShortCourseDTO>>(response);
         }
 
+
+
         public void EditCommand(ShortCourseDTO Item)
         {
             MainWindowViewModel.Instance.PageContent = new AddEditCourse(Item);
+        }
+
+        public async Task DeleteCommand(ShortCourseDTO Item)
+        {
+            var result = await MessageBoxManager.GetMessageBoxStandard("Вы уверены?", $"Вы действительно хотите удалить курс {Item.CourseName}?", MsBox.Avalonia.Enums.ButtonEnum.YesNo).ShowAsync();
+
+            if(result == MsBox.Avalonia.Enums.ButtonResult.Yes)
+            {
+                var response = await MainWindowViewModel.ApiClient.DeleteCourse(Item);
+            }
+            MainWindowViewModel.Instance.PageContent = new CoursePage();
+
         }
 
         public void ToBlockOfCourses(ShortCourseDTO Item)

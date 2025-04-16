@@ -69,6 +69,12 @@
 			<!-- Add Burron -->
 			<Button Background="#D28530" Width="157" Height="45" Padding="" HorizontalAlignment="Right" Command="{Binding SaveData}" Foreground="White">
 				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16">Сохранить</TextBlock>
+				<Button.Styles>
+					<Style Selector="Button:pointerover /template/ ContentPresenter">
+						<Setter Property="TextBlock.Foreground" Value="White"/>
+						<Setter Property="Background" Value="#DDA364"/>
+					</Style>
+				</Button.Styles>
 			</Button>
 
 		</Grid>

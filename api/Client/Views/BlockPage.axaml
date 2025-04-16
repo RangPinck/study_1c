@@ -36,5 +36,18 @@
 
 			</ListBox.ItemTemplate>
 		</ListBox>
+		<Grid Grid.Row="2">
+			<Button Background="#D28530" Width="157" Height="45" HorizontalAlignment="Left" Foreground="White" Margin="30,0,0 10" Command="{Binding ToCourses}">
+				<Button.Styles>
+					<Style Selector="Button:pointerover /template/ ContentPresenter">
+						<Setter Property="TextBlock.Foreground" Value="White"/>
+						<Setter Property="Background" Value="#DDA364"/>
+					</Style>
+				</Button.Styles>
+				
+				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" >Назад</TextBlock>
+				
+			</Button>
+		</Grid>
 	</Grid>
 </UserControl>

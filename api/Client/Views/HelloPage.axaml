@@ -20,6 +20,13 @@
 		</Button>
 		<TextBlock Padding="20,40,0,0" xml:space="preserve" Grid.Row="1" FontSize="20" Grid.ColumnSpan="2" Text="{Binding BodyText}" TextWrapping="Wrap"></TextBlock>
 		<Button Grid.Row="2" Width="152" Height="44" Background="#D28530" Grid.Column="1" FontSize="20" HorizontalContentAlignment="Center"
-        VerticalContentAlignment="Center"  Content="{Binding ButtonText}" Foreground="White" CornerRadius="7" Command="{Binding Next}"></Button>
+        VerticalContentAlignment="Center"  Content="{Binding ButtonText}" Foreground="White" CornerRadius="7" Command="{Binding Next}">
+			<Button.Styles>
+				<Style Selector="Button:pointerover /template/ ContentPresenter">
+					<Setter Property="TextBlock.Foreground" Value="White"/>
+					<Setter Property="Background" Value="#DDA364"/>
+				</Style>
+			</Button.Styles>
+		</Button>
 	</Grid>
 </UserControl>

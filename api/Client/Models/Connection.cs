@@ -133,8 +133,25 @@ namespace Client.Models
 
         public async Task<string> UpdateCourse(UpdateCourseDTO newCourse)
         {
+            Client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", MainWindowViewModel.Instance.CurrentUser.Token);
             JsonContent newCourseSerialize = JsonContent.Create(newCourse);
             HttpResponseMessage response = await Client.PutAsync("Course/UpdateCourse", newCourseSerialize);
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                MainWindowViewModel.Instance.ErrorMessage("Ошибка обновления курса!", ParseErrorResponse(responseBody));
+            }
+
+            return responseBody;
+        }
+
+        public async Task<string> DeleteCourse(ShortCourseDTO courseInfo)
+        {
+            Client.DefaultRequestHeaders.Authorization =
+             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", MainWindowViewModel.Instance.CurrentUser.Token);
+            HttpResponseMessage response = await Client.DeleteAsync($"Course/DeleteCourse?courseId={courseInfo.CourseId}");
             string responseBody = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)

@@ -112,5 +112,15 @@ namespace Client.ViewModels
         {
             await MessageBoxManager.GetMessageBoxStandard(title, message, MsBox.Avalonia.Enums.ButtonEnum.Ok).ShowAsync();
         }
+
+
+        public async Task<bool> YesNoMessage(string title, string message)
+        {
+            var result = await MessageBoxManager.GetMessageBoxStandard(title, message, MsBox.Avalonia.Enums.ButtonEnum.YesNo).ShowAsync();
+
+            bool isYes = result == MsBox.Avalonia.Enums.ButtonResult.Yes;
+
+            return isYes;
+        }
     }
 }

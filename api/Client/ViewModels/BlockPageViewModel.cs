@@ -20,27 +20,17 @@ namespace Client.ViewModels
             GetData(currentCourse);
         }
 
-        private bool myPopup = false;
-
         private List<ShortBlockDTO> _blocks = new();
 
         public List<ShortBlockDTO> Blocks { get => _blocks; set => this.RaiseAndSetIfChanged(ref _blocks, value); }
-        public bool MyPopup { get => myPopup; set => this.RaiseAndSetIfChanged(ref myPopup, value); }
-
         async Task GetData(ShortCourseDTO currentCourse)
         {
             var response = await MainWindowViewModel.ApiClient.GetBlock(currentCourse);
             Blocks = JsonConvert.DeserializeObject<List<ShortBlockDTO>>(response);
         }
-
-        private void OnButtonClick(object? sender, RoutedEventArgs e)
+        public void ToCourses()
         {
-            MyPopup = true;
-        }
-
-        private void OnClosePopupClick(object? sender, RoutedEventArgs e)
-        {
-            MyPopup = false;
+            MainWindowViewModel.Instance.PageContent = new CoursePage();
         }
 
     }

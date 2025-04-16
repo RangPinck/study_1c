@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Client.Models.Statistics;
+using System;
 using System.Collections.Generic;
 
 namespace Client.Models.Users
@@ -20,5 +21,7 @@ namespace Client.Models.Users
         public List<string> UserRole { get; set; } = new List<string>();
 
         public DateTime UserDataCreate { get; set; }
+
+        public List<BlockStatisticsDTO> UserStatistics { get; set; } = new List<BlockStatisticsDTO>();
     }
 }
