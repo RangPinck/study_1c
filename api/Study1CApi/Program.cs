@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using Study1CApi.Initializers;
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
@@ -76,7 +77,6 @@ public class Program
         builder.Services.AddScoped<IPracticeRepository, PracticeRepository>();
         builder.Services.AddScoped<IStatusStudyRepository, StatusStudyRepository>();
 
-
         builder.Services.AddIdentity<AuthUser, Role>(options =>
         {
             options.Password.RequiredLength = 6;
@@ -140,12 +140,18 @@ public class Program
                 }
             };
         });
+
         builder.Services.AddAuthorization(options =>
         {
             options.FallbackPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build();
         });
+
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .WriteTo.File($"Logs/Study1CApiLog-.txt", rollingInterval: RollingInterval.Day, shared: true, retainedFileCountLimit: 10)
+            .CreateLogger();
 
         var app = builder.Build();
 

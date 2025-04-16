@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Study1CApi.DTOs.RoleDTOs;
 using Study1CApi.Models;
 using Swashbuckle.AspNetCore.Annotations;
@@ -44,6 +45,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get all roles => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -69,6 +71,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get role by id => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -116,6 +119,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"add role => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -172,6 +176,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"update role => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -215,6 +220,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"delete role => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }

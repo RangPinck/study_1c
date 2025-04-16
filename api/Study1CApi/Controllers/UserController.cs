@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Study1CApi.DTOs.UserDTOs;
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
@@ -50,6 +47,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get all users => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }

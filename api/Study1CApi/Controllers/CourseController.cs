@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Study1CApi.DTOs.CourseDTOs;
 using Study1CApi.DTOs.UserDTOs;
 using Study1CApi.Interfaces;
@@ -65,6 +66,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get all course => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -90,6 +92,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get course by id => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -115,6 +118,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get authors for course => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -163,6 +167,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"add course => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -216,6 +221,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"subscribe user to course => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -268,6 +274,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"update course => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -320,6 +327,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"delete course => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -373,6 +381,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"unsubscribe user to course => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
