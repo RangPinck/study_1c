@@ -42,6 +42,8 @@ namespace Study1CApi.Repositories
                         {
                             BlockId = block.BlockId,
 
+                            BlockName = block.BlockName,
+
                             FullyCountTask = block.BlocksTasks.Count() + block.BlocksMaterials.Where(mat => mat.Duration != null).Count() + block.BlocksTasks.Select(x => x.TasksPractices.Count()).Sum(),
 
                             FullyDurationNeeded = block.BlocksTasks.Select(x => x.Duration).Sum() + block.BlocksMaterials.Where(mat => mat.Duration != null).Select(x => Convert.ToInt32(x.Duration)).Sum() + block.BlocksTasks.Select(x => x.TasksPractices.Select(x => Convert.ToInt32(x.Duration)).Sum()).Sum(),
@@ -70,6 +72,8 @@ namespace Study1CApi.Repositories
                         UserStatistics = _context.CoursesBlocks.Select(block => new BlockStatisticsDTO()
                         {
                             BlockId = block.BlockId,
+
+                            BlockName = block.BlockName,
 
                             FullyCountTask = block.BlocksTasks.Count() + block.BlocksMaterials.Where(mat => mat.Duration != null).Count() + block.BlocksTasks.Select(x => x.TasksPractices.Count()).Sum(),
 
