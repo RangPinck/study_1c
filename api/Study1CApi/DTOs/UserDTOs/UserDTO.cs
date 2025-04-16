@@ -1,3 +1,5 @@
+using Study1CApi.DTOs.BlockDTOs;
+
 namespace Study1CApi.DTOs.UserDTOs
 {
     public class UserDTO
@@ -17,5 +19,7 @@ namespace Study1CApi.DTOs.UserDTOs
         public List<string> UserRole { get; set; } = new List<string>();
 
         public DateTime UserDataCreate { get; set; }
+
+        public List<BlockStatisticsDTO> UserStatistics { get; set; } = new List<BlockStatisticsDTO>();
     }
 }

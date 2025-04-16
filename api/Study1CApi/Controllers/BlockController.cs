@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Study1CApi.DTOs.BlockDTOs;
 using Study1CApi.DTOs.CourseDTOs;
 using Study1CApi.Interfaces;
@@ -63,6 +64,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get blocks of course => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -116,6 +118,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"add block => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -168,6 +171,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"update block => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -219,6 +223,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"delete block => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }

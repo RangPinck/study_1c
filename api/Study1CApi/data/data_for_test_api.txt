@@ -222,3 +222,75 @@
   "duration": 10,
   "link": "string"
 }
+
+обновление статуса задачи:
+вариватн 1:
+{
+  "stateId": 1,
+  "updateObjectId": "e744bfd1-a477-4d64-9918-9eb71b19bbb7",
+  "blockId": "2acc63f9-a297-4f90-a0b8-2ffddbdfb3f2",
+  "duration": 0
+}
+вариватн 2:
+{
+  "stateId": 2,
+  "updateObjectId": "e744bfd1-a477-4d64-9918-9eb71b19bbb7",
+  "blockId": "2acc63f9-a297-4f90-a0b8-2ffddbdfb3f2",
+  "duration": 0
+}
+вариватн 3:
+{
+  "stateId": 3,
+  "updateObjectId": "e744bfd1-a477-4d64-9918-9eb71b19bbb7",
+  "blockId": "2acc63f9-a297-4f90-a0b8-2ffddbdfb3f2",
+  "duration": 100
+}
+
+
+обновление статуса практики:
+вариватн 1:
+{
+  "stateId": 1,
+  "updateObjectId": "45791282-2fc5-4a74-8de0-9268954e126c",
+  "blockId": "2acc63f9-a297-4f90-a0b8-2ffddbdfb3f2",
+  "duration": 0
+}
+вариватн 2:
+{
+  "stateId": 2,
+  "updateObjectId": "45791282-2fc5-4a74-8de0-9268954e126c",
+  "blockId": "2acc63f9-a297-4f90-a0b8-2ffddbdfb3f2",
+  "duration": 0
+}
+вариватн 3:
+{
+  "stateId": 3,
+  "updateObjectId": "45791282-2fc5-4a74-8de0-9268954e126c",
+  "blockId": "2acc63f9-a297-4f90-a0b8-2ffddbdfb3f2",
+  "duration": 100
+}
+
+обновление статуса материала:
+вариватн 1:
+{
+  "stateId": 1,
+  "updateObjectId": "f87e99d7-9013-4578-a09a-dd7c86d58cce",
+  "blockId": "2acc63f9-a297-4f90-a0b8-2ffddbdfb3f2",
+  "duration": 0
+}
+
+вариватн 2:
+{
+  "stateId": 2,
+  "updateObjectId": "f87e99d7-9013-4578-a09a-dd7c86d58cce",
+  "blockId": "2acc63f9-a297-4f90-a0b8-2ffddbdfb3f2",
+  "duration": 0
+}
+
+вариватн 3:
+{
+  "stateId": 3,
+  "updateObjectId": "f87e99d7-9013-4578-a09a-dd7c86d58cce",
+  "blockId": "2acc63f9-a297-4f90-a0b8-2ffddbdfb3f2",
+  "duration": 100
+}

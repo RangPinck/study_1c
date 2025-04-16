@@ -1,13 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Study1CApi.DTOs.AccountDTOs;
 using Study1CApi.DTOs.AuthDTO;
 using Study1CApi.DTOs.UserDTOs;
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
 using Swashbuckle.AspNetCore.Annotations;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Study1CApi.Controllers
 {
@@ -70,10 +73,13 @@ namespace Study1CApi.Controllers
                     Token = _tokenService.CreateToken(appUser, userRole.First())
                 };
 
+                Log.Information($"loggin => {profile.Id}");
+
                 return Ok(profile);
             }
             catch (Exception e)
             {
+                Log.Error($"loggin => {e.Message}");
                 return StatusCode(500, e.Message);
             }
         }
@@ -146,23 +152,39 @@ namespace Study1CApi.Controllers
                                 UserRole = new List<string> { role.Name }
                             };
 
+                            Log.Information($"registration => {newUserDTO.UserId}");
+
                             return Ok(newUserDTO);
                         }
-                        else return BadRequest("User creation error!");
+                        else
+                        {
+                            Log.Error($"registration => User creation error!");
+                            return BadRequest("User creation error!");
+                        }
                     }
-                    else return BadRequest(roleResult.Errors.FirstOrDefault().Description);
+                    else
+                    {
+                        Log.Error($"registration => {roleResult.Errors.FirstOrDefault().Description}");
+                        return BadRequest(roleResult.Errors.FirstOrDefault().Description);
+                    }
+                    ;
                 }
                 else
                 {
                     var error = createdUser.Errors.FirstOrDefault();
                     if (error != null)
                         if (error.Code == "DuplicateUserName")
+                        {
+                            Log.Error($"registration => There is already such a user!");
                             return BadRequest("There is already such a user!");
+                        }
+                    Log.Error($"registration => {error.Description}");
                     return BadRequest(error.Description);
                 }
             }
             catch (Exception e)
             {
+                Log.Error($"registration => {e.Message}");
                 return StatusCode(500, e.Message);
             }
         }
@@ -199,10 +221,15 @@ namespace Study1CApi.Controllers
                         authUser.ConcurrencyStamp = DateTime.UtcNow.ToString();
                         result = await _userManager.UpdateAsync(authUser);
 
-                        if (!result.Succeeded) return BadRequest("Incorrect data!");
+                        if (!result.Succeeded)
+                        {
+                            Log.Error($"update profile => Incorrect data!");
+                            return BadRequest("Incorrect data!");
+                        }
                     }
                     else
                     {
+                        Log.Error($"update profile => Incorrect data!");
                         return BadRequest("Incorrect data!");
                     }
                 }
@@ -296,6 +323,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"update password => {ex.Message}");
                 return StatusCode(500, ex.Message);
             }
         }
@@ -336,6 +364,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"update role user => {ex.Message}");
                 return StatusCode(500, ex.Message);
             }
         }
@@ -366,6 +395,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"user first login => {ex.Message}");
                 return StatusCode(500, ex.Message);
             }
         }
@@ -415,6 +445,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"delete profile => {ex.Message}");
                 return StatusCode(500, ex.Message);
             }
         }

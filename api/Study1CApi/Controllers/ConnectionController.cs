@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Study1CApi.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -26,8 +27,10 @@ namespace Study1CApi.Controllers
             var connection = await _connectionRepository.CheckConnectionAsyncAsync();
 
             if (connection.IsConnect == ConnectionEnum.Connect){
+                Log.Information($"check connection database => connection success");
                 return Ok("Database is connected!");
             }else{
+                Log.Error($"check connection database => connection not found");
                 return BadRequest(connection.Error);
             }
         }
