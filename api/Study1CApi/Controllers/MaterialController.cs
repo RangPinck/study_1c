@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Study1CApi.DTOs.MaterialDTOs;
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
@@ -44,6 +45,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get materials types => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -73,6 +75,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get all materials => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -102,6 +105,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get material by id => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -163,6 +167,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"add material => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -227,6 +232,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"add material to block => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -289,6 +295,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"update materials => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -352,6 +359,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"update material on block=> {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -399,6 +407,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"delete material => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -452,6 +461,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"delete material of block => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }

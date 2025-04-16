@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Study1CApi.DTOs.MaterialDTOs;
 using Study1CApi.DTOs.PracticeDTOs;
 using Study1CApi.Interfaces;
@@ -52,6 +53,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get practics => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -81,6 +83,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get practice by id => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -143,18 +146,19 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"add practice => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
 
 
         [SwaggerOperation(Summary = "Обновление практики")]
-        [HttpPut("UpdateMaterial")]
+        [HttpPut("UpdatePractice")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [Authorize(Roles = "Администратор, Куратор")]
-        public async Task<IActionResult> UpdateMaterial(UpdatePracticeDTO updatedPractice)
+        public async Task<IActionResult> UpdatePractice(UpdatePracticeDTO updatedPractice)
         {
             try
             {
@@ -202,6 +206,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"update practice => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -251,6 +256,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"delete practice => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }

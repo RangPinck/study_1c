@@ -4,6 +4,8 @@ namespace Study1CApi.DTOs.MaterialDTOs
     {
         public Guid MaterialId { get; set; }
 
+        public Guid BlockMaterialId { get; set; }
+
         public string MaterialName { get; set; } = null!;
 
         public DateTime MaterialDateCreate { get; set; }

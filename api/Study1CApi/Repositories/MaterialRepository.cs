@@ -28,6 +28,7 @@ namespace Study1CApi.Repositories
             return await _context.BlocksMaterials.AsNoTracking().Where(material => material.Block == blockId && material.MaterialNavigation.Type == materialTypeId).Select(material => new MaterialDTO()
             {
                 MaterialId = material.MaterialNavigation.MaterialId,
+                BlockMaterialId = material.BmId,
                 MaterialName = material.MaterialNavigation.MaterialName,
                 MaterialDateCreate = material.MaterialNavigation.MaterialDateCreate,
                 Link = material.MaterialNavigation.Link,
@@ -48,6 +49,7 @@ namespace Study1CApi.Repositories
             return await _context.BlocksMaterials.AsNoTracking().Select(material => new MaterialDTO()
             {
                 MaterialId = material.MaterialNavigation.MaterialId,
+                BlockMaterialId = material.BmId,
                 MaterialName = material.MaterialNavigation.MaterialName,
                 MaterialDateCreate = material.MaterialNavigation.MaterialDateCreate,
                 Link = material.MaterialNavigation.Link,

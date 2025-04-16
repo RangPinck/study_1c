@@ -1,4 +1,4 @@
-namespace Study1CApi.DTOs.TaskDTOs
+namespace Study1CApi.DTOs.StudyStateDTOs
 {
     public class StudyStateDTO
     {

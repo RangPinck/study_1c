@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Study1CApi.DTOs.MaterialDTOs;
 using Study1CApi.DTOs.TaskDTOs;
 using Study1CApi.Interfaces;
@@ -51,6 +52,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get all tasks => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -80,6 +82,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"get task by id => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -141,6 +144,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"add task => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -199,6 +203,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"update task => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
@@ -246,6 +251,7 @@ namespace Study1CApi.Controllers
             }
             catch (Exception ex)
             {
+                Log.Error($"delete task => {ex.Message}");
                 return StatusCode(503, ex.Message);
             }
         }
