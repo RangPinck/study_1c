@@ -4,6 +4,8 @@ namespace Study1CApi.DTOs.BlockDTOs
     {
         public Guid BlockId { get; set; }
 
+        public string BlockName { get; set; }
+
         public int FullyCountTask { get; set; }
 
         public int FullyDurationNeeded { get; set; }
