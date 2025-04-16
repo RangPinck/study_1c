@@ -47,7 +47,7 @@ namespace Client.ViewModels
         async Task GetAuthors(string token)
         {
           
-            var response = await MainWindowViewModel.ApiClient.GetAuthors();
+            var response = await MainWindowViewModel.ApiClient.GetCourses();
 
             Users = JsonConvert.DeserializeObject<List<UserDTO>>(response);
             AuthorIndex = 1;
