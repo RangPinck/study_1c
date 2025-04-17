@@ -383,6 +383,7 @@ namespace Study1CApi.Controllers
                     return BadRequest(ModelState);
 
                 var httpUser = HttpContext.User;
+
                 var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
 
                 var appUser = await _userManager.FindByIdAsync(authUser.Id.ToString());

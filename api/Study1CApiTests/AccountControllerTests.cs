@@ -15,6 +15,8 @@ using Study1CApi.DTOs.UserDTOs;
 using Study1CApi.Interfaces;
 using Study1CApi.Models;
 using Study1CApi.Repositories;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Study1CApiTests
 {
@@ -100,10 +102,6 @@ namespace Study1CApiTests
                 .Returns(Task.FromResult(IdentityResult.Success));
 
             userManagerMock
-                .Setup(um => um.AddToRoleAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
-                .Returns(Task.FromResult(IdentityResult.Success));
-
-            userManagerMock
                 .Setup(um => um.FindByEmailAsync(dto.Email)).
                 ReturnsAsync(new AuthUser { UserName = dto.Email, Email = dto.Email, Id = idProfile });
 
@@ -123,11 +121,7 @@ namespace Study1CApiTests
 
             var mockRoleManager = new Mock<RoleManager<Role>>(
                 roleStoreMock.Object,
-                null,
-                null,
-                null,
-                null
-            );
+                null, null, null, null);
 
             var accountRepository = new AccountRepository(_context);
 
@@ -174,12 +168,15 @@ namespace Study1CApiTests
                 .Setup(userManager => userManager
                 .CreateAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
                 .Returns(Task.FromResult(IdentityResult.Success));
+
             userManagerMock
                 .Setup(um => um.AddToRoleAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
                 .Returns(Task.FromResult(IdentityResult.Success));
+
             userManagerMock
                 .Setup(um => um.FindByEmailAsync(dto.Email)).
                 ReturnsAsync(new AuthUser { UserName = dto.Email, Email = dto.Email });
+
             userManagerMock
                 .Setup(um => um.GetRolesAsync(It.Is<AuthUser>(u => u.Id == idProfile)))
                 .ReturnsAsync(new List<string> { "Администратор" });
@@ -309,10 +306,6 @@ namespace Study1CApiTests
                 .Returns(Task.FromResult(IdentityResult.Success));
 
             userManagerMock
-                .Setup(um => um.AddToRoleAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
-                .Returns(Task.FromResult(IdentityResult.Success));
-
-            userManagerMock
                 .Setup(um => um.FindByEmailAsync(dto.Email)).
                 ReturnsAsync(new AuthUser { UserName = dto.Email, Email = dto.Email, Id = idProfile });
 
@@ -362,6 +355,8 @@ namespace Study1CApiTests
                 Password = "admin1cdbapi"
             };
 
+            var userRoles = new List<string> { "Администратор" };
+
             var userManagerMock = new Mock<UserManager<AuthUser>>(
                 new Mock<IUserStore<AuthUser>>().Object,
                 new Mock<IOptions<IdentityOptions>>().Object,
@@ -374,17 +369,20 @@ namespace Study1CApiTests
                 new Mock<ILogger<UserManager<AuthUser>>>().Object);
 
             userManagerMock
-                .Setup(userManager => userManager
-                .CreateAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
-                .Returns(Task.FromResult(IdentityResult.Success));
-
-            userManagerMock
-                .Setup(um => um.AddToRoleAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
-                .Returns(Task.FromResult(IdentityResult.Success));
-
-            userManagerMock
                 .Setup(um => um.FindByEmailAsync(dto.Email)).
                 ReturnsAsync(new AuthUser { UserName = dto.Email, Email = dto.Email, Id = idProfile });
+
+            userManagerMock
+                .Setup(um => um.FindByIdAsync(idProfile.ToString())).
+                ReturnsAsync(new AuthUser { UserName = dto.Email, Email = dto.Email, Id = idProfile });
+
+            userManagerMock
+                .Setup(um => um.GetRolesAsync(It.Is<AuthUser>(u => u.Id == idProfile)))
+                .ReturnsAsync(new List<string> { "Администратор" });
+
+            userManagerMock
+                .Setup(um => um.UpdateAsync(It.IsAny<AuthUser>()))
+                .ReturnsAsync(IdentityResult.Success);
 
             var signInManager = new Mock<SignInManager<AuthUser>>(
                 userManagerMock.Object, Mock.Of<IHttpContextAccessor>(),
@@ -406,7 +404,25 @@ namespace Study1CApiTests
 
             var accountRepository = new AccountRepository(_context);
 
-            var controller = new AccountController(userManagerMock.Object, _tokenService, signInManager.Object, mockRoleManager.Object, _context, accountRepository);
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, "admin@admin.com"),
+                new Claim(ClaimTypes.NameIdentifier, idProfile.ToString())
+            };
+
+            var identity = new ClaimsIdentity(claims);
+
+            var user = new ClaimsPrincipal(identity);
+
+            var mockHttpContext = new DefaultHttpContext() { User = user };
+
+            var controller = new AccountController(userManagerMock.Object, _tokenService, signInManager.Object, mockRoleManager.Object, _context, accountRepository)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = mockHttpContext
+                }
+            };
 
             var result = await controller.UpdateProfile(dto);
 
@@ -418,7 +434,459 @@ namespace Study1CApiTests
             }
 
             result.Should().NotBeNull();
-            result.Should().BeAssignableTo<UnauthorizedObjectResult>();
+            result.Should().BeAssignableTo<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task AccountControllerTests_UpdateUserPassword_ReturnOKAsync()
+        {
+            var dto = new UpdatePasswordDTO()
+            {
+                Email = "admin@admin.com",
+                Password = "12345678",
+                ConfirmPassword = "12345678"
+            };
+
+            var auth = new LoginDTO()
+            {
+                Email = "admin@admin.com",
+                Password = "admin1cdbapi"
+            };
+
+            var userRoles = new List<string> { "Администратор" };
+
+            var userManagerMock = new Mock<UserManager<AuthUser>>(
+                new Mock<IUserStore<AuthUser>>().Object,
+                new Mock<IOptions<IdentityOptions>>().Object,
+                new Mock<IPasswordHasher<AuthUser>>().Object,
+                new IUserValidator<AuthUser>[0],
+                new IPasswordValidator<AuthUser>[0],
+                new Mock<ILookupNormalizer>().Object,
+                new Mock<IdentityErrorDescriber>().Object,
+                new Mock<IServiceProvider>().Object,
+                new Mock<ILogger<UserManager<AuthUser>>>().Object);
+
+            userManagerMock
+                .Setup(um => um.FindByEmailAsync(dto.Email)).
+                ReturnsAsync(new AuthUser { UserName = dto.Email, Email = dto.Email, Id = idProfile });
+
+            userManagerMock
+                .Setup(um => um.FindByIdAsync(idProfile.ToString())).
+                ReturnsAsync(new AuthUser { UserName = dto.Email, Email = dto.Email, Id = idProfile });
+
+            userManagerMock
+                .Setup(um => um.GetRolesAsync(It.Is<AuthUser>(u => u.Id == idProfile)))
+                .ReturnsAsync(new List<string> { "Администратор" });
+
+            string token = "token";
+
+            userManagerMock
+                .Setup(um => um.GeneratePasswordResetTokenAsync(It.IsAny<AuthUser>()))
+                .ReturnsAsync(token);
+
+            userManagerMock
+                .Setup(um => um.ResetPasswordAsync(It.IsAny<AuthUser>(), token, dto.ConfirmPassword))
+                .ReturnsAsync(IdentityResult.Success);
+
+            var signInManager = new Mock<SignInManager<AuthUser>>(
+                userManagerMock.Object, Mock.Of<IHttpContextAccessor>(),
+                Mock.Of<IUserClaimsPrincipalFactory<AuthUser>>(), null, null, null, null);
+
+            signInManager
+                .Setup(s => s.CheckPasswordSignInAsync(It.IsAny<AuthUser>(), auth.Password, false))
+                .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Failed);
+
+            var roleStoreMock = new Mock<IRoleStore<Role>>();
+
+            var mockRoleManager = new Mock<RoleManager<Role>>(
+                roleStoreMock.Object,
+                null,
+                null,
+                null,
+                null
+            );
+
+            var accountRepository = new AccountRepository(_context);
+
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, "admin@admin.com"),
+                new Claim(ClaimTypes.NameIdentifier, idProfile.ToString())
+            };
+
+            var identity = new ClaimsIdentity(claims);
+
+            var user = new ClaimsPrincipal(identity);
+
+            var mockHttpContext = new DefaultHttpContext() { User = user };
+
+            var controller = new AccountController(userManagerMock.Object, _tokenService, signInManager.Object, mockRoleManager.Object, _context, accountRepository)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = mockHttpContext
+                }
+            };
+
+            var result = await controller.UpdatePasswordForProfile(dto);
+
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task AccountControllerTests_UpdateRoleProfile_ReturnOKAsync()
+        {
+            var dto = new UpdateUserRoleDTO()
+            {
+                UserId = new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"),
+                RoleId = new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e")
+            };
+
+            var auth = new LoginDTO()
+            {
+                Email = "admin@admin.com",
+                Password = "admin1cdbapi"
+            };
+
+            var userAuth = new RegistrationDTO()
+            {
+                UserSurname = "admin",
+                UserName = "admin",
+                UserPatronymic = "",
+                Email = "admin@admin.com",
+                Password = "12345678",
+                ConfirmPassword = "admin1cdbapi",
+                RoleId = new Guid("f45d2396-3e72-4ec7-b892-7bd454248158")
+            };
+
+            var updateUser = new RegistrationDTO()
+            {
+                UserSurname = "curator",
+                UserName = "curator",
+                UserPatronymic = "",
+                Email = "curator@curator.com",
+                Password = "12345678",
+                ConfirmPassword = "12345678",
+                RoleId = new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e")
+            };
+
+            var userRoles = new List<string> { "Администратор" };
+
+            var userManagerMock = new Mock<UserManager<AuthUser>>(
+                new Mock<IUserStore<AuthUser>>().Object,
+                new Mock<IOptions<IdentityOptions>>().Object,
+                new Mock<IPasswordHasher<AuthUser>>().Object,
+                new IUserValidator<AuthUser>[0],
+                new IPasswordValidator<AuthUser>[0],
+                new Mock<ILookupNormalizer>().Object,
+                new Mock<IdentityErrorDescriber>().Object,
+                new Mock<IServiceProvider>().Object,
+                new Mock<ILogger<UserManager<AuthUser>>>().Object);
+
+            userManagerMock
+                .Setup(um => um.FindByIdAsync(It.Is<string>(id => id == idProfile.ToString()))).
+                ReturnsAsync(new AuthUser { UserName = userAuth.UserName, Email = userAuth.Email, Id = idProfile });
+
+            userManagerMock
+                .Setup(um => um.FindByIdAsync(It.Is<string>(id => id == "c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"))).
+                ReturnsAsync(new AuthUser { UserName = updateUser.UserName, Email = updateUser.Email, Id = new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e") });
+
+            userManagerMock
+                .Setup(um => um.GetRolesAsync(It.Is<AuthUser>(u => u.Id == idProfile)))
+                .ReturnsAsync(new List<string> { "Администратор" });
+
+            userManagerMock
+                .Setup(um => um.GetRolesAsync(It.Is<AuthUser>(u => u.Id == new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"))))
+                .ReturnsAsync(new List<string> { "Куратор" });
+
+            userManagerMock
+                .Setup(um => um.RemoveFromRoleAsync(It.IsAny<AuthUser>(), "Куратор"))
+                .ReturnsAsync(IdentityResult.Success);
+
+            userManagerMock
+                .Setup(um => um.AddToRoleAsync(It.IsAny<AuthUser>(), "Куратор"))
+                .ReturnsAsync(IdentityResult.Success);
+
+            var signInManager = new Mock<SignInManager<AuthUser>>(
+                userManagerMock.Object, Mock.Of<IHttpContextAccessor>(),
+                Mock.Of<IUserClaimsPrincipalFactory<AuthUser>>(), null, null, null, null);
+
+            signInManager
+                .Setup(s => s.CheckPasswordSignInAsync(It.IsAny<AuthUser>(), auth.Password, false))
+                .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Failed);
+
+            var roleStoreMock = new Mock<IRoleStore<Role>>();
+
+            var mockRoleManager = new Mock<RoleManager<Role>>(
+                roleStoreMock.Object,
+                null,
+                null,
+                null,
+                null
+            );
+
+            mockRoleManager.Setup(x => x.FindByIdAsync(It.Is<string>(id => id == "c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e")))
+                  .ReturnsAsync(new Role { Id = Guid.Parse("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"), Name = "Куратор" });
+
+            mockRoleManager.Setup(x => x.FindByIdAsync(It.Is<string>(id => id == "f45d2396-3e72-4ec7-b892-7bd454248158")))
+                  .ReturnsAsync(new Role { Id = Guid.Parse("f45d2396-3e72-4ec7-b892-7bd454248158"), Name = "Администратор" });
+
+            var accountRepository = new AccountRepository(_context);
+
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, "admin@admin.com"),
+                new Claim(ClaimTypes.NameIdentifier, idProfile.ToString())
+            };
+
+            var identity = new ClaimsIdentity(claims);
+
+            var user = new ClaimsPrincipal(identity);
+
+            var mockHttpContext = new DefaultHttpContext() { User = user };
+
+            var controller = new AccountController(userManagerMock.Object, _tokenService, signInManager.Object, mockRoleManager.Object, _context, accountRepository)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = mockHttpContext
+                }
+            };
+
+            var result = await controller.UpdateRoleProfile(dto);
+
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task AccountControllerTests_RegistrationUserFirstLogin_ReturnOKAsync()
+        {
+            var userManagerMock = new Mock<UserManager<AuthUser>>(
+                new Mock<IUserStore<AuthUser>>().Object,
+                new Mock<IOptions<IdentityOptions>>().Object,
+                new Mock<IPasswordHasher<AuthUser>>().Object,
+                new IUserValidator<AuthUser>[0],
+                new IPasswordValidator<AuthUser>[0],
+                new Mock<ILookupNormalizer>().Object,
+                new Mock<IdentityErrorDescriber>().Object,
+                new Mock<IServiceProvider>().Object,
+                new Mock<ILogger<UserManager<AuthUser>>>().Object);
+
+            var userAuth = new RegistrationDTO()
+            {
+                UserSurname = "admin",
+                UserName = "admin",
+                UserPatronymic = "",
+                Email = "admin@admin.com",
+                Password = "12345678",
+                ConfirmPassword = "admin1cdbapi",
+                RoleId = new Guid("f45d2396-3e72-4ec7-b892-7bd454248158")
+            };
+
+            userManagerMock
+                .Setup(userManager => userManager
+                .CreateAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
+                .Returns(Task.FromResult(IdentityResult.Success));
+
+            userManagerMock
+                .Setup(um => um.AddToRoleAsync(It.IsAny<AuthUser>(), It.IsAny<string>()))
+                .Returns(Task.FromResult(IdentityResult.Success));
+
+            userManagerMock
+                .Setup(um => um.GetRolesAsync(It.Is<AuthUser>(u => u.Id == idProfile)))
+                .ReturnsAsync(new List<string> { "Администратор" });
+
+            userManagerMock
+                .Setup(um => um.FindByIdAsync(It.Is<string>(id => id == idProfile.ToString()))).
+                ReturnsAsync(new AuthUser { UserName = userAuth.UserName, Email = userAuth.Email, Id = idProfile });
+
+            userManagerMock
+                .Setup(um => um.FindByEmailAsync("admin@admin.com")).
+                ReturnsAsync(new AuthUser { UserName = "admin@admin.com", Email = "admin@admin.com", Id = idProfile });
+
+            var signInManager = new Mock<SignInManager<AuthUser>>(
+                userManagerMock.Object, Mock.Of<IHttpContextAccessor>(),
+                Mock.Of<IUserClaimsPrincipalFactory<AuthUser>>(), null, null, null, null);
+
+            var roleStoreMock = new Mock<IRoleStore<Role>>();
+
+            var mockRoleManager = new Mock<RoleManager<Role>>(
+               roleStoreMock.Object,
+               null,
+               null,
+               null,
+               null
+           );
+
+            var accountRepository = new AccountRepository(_context);
+
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, "admin@admin.com"),
+                new Claim(ClaimTypes.NameIdentifier, idProfile.ToString())
+            };
+
+            var identity = new ClaimsIdentity(claims);
+
+            var user = new ClaimsPrincipal(identity);
+
+            var mockHttpContext = new DefaultHttpContext() { User = user };
+
+            var controller = new AccountController(userManagerMock.Object, _tokenService, signInManager.Object, mockRoleManager.Object, _context, accountRepository)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = mockHttpContext
+                }
+            };
+
+            var result = await controller.RegistrationUserFirstLogin();
+
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task AccountControllerTests_DeleteAccount_ReturnOKAsync()
+        {
+            var dto = new DeleteAccountDTO()
+            {
+                UserId = new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e")
+            };
+
+            var auth = new LoginDTO()
+            {
+                Email = "admin@admin.com",
+                Password = "admin1cdbapi"
+            };
+
+            var userAuth = new RegistrationDTO()
+            {
+                UserSurname = "admin",
+                UserName = "admin",
+                UserPatronymic = "",
+                Email = "admin@admin.com",
+                Password = "12345678",
+                ConfirmPassword = "admin1cdbapi",
+                RoleId = new Guid("f45d2396-3e72-4ec7-b892-7bd454248158")
+            };
+
+            var deleteUser = new RegistrationDTO()
+            {
+                UserSurname = "curator",
+                UserName = "curator",
+                UserPatronymic = "",
+                Email = "curator@curator.com",
+                Password = "12345678",
+                ConfirmPassword = "12345678",
+                RoleId = new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e")
+            };
+
+            var userRoles = new List<string> { "Администратор" };
+
+            var userManagerMock = new Mock<UserManager<AuthUser>>(
+                new Mock<IUserStore<AuthUser>>().Object,
+                new Mock<IOptions<IdentityOptions>>().Object,
+                new Mock<IPasswordHasher<AuthUser>>().Object,
+                new IUserValidator<AuthUser>[0],
+                new IPasswordValidator<AuthUser>[0],
+                new Mock<ILookupNormalizer>().Object,
+                new Mock<IdentityErrorDescriber>().Object,
+                new Mock<IServiceProvider>().Object,
+                new Mock<ILogger<UserManager<AuthUser>>>().Object);
+
+            userManagerMock
+                .Setup(um => um.FindByIdAsync(It.Is<string>(id => id == idProfile.ToString())))
+                .ReturnsAsync(new AuthUser { UserName = userAuth.UserName, Email = userAuth.Email, Id = idProfile });
+
+            userManagerMock
+                .Setup(um => um.FindByIdAsync(It.Is<string>(id => id == "c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e")))
+                .ReturnsAsync(new AuthUser { UserName = deleteUser.UserName, Email = deleteUser.Email, Id = new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e") });
+
+            userManagerMock
+                .Setup(um => um.FindByEmailAsync(It.Is<string>(email => email == auth.Email)))
+                .ReturnsAsync(new AuthUser { UserName = userAuth.UserName, Email = userAuth.Email, Id = idProfile });
+
+            userManagerMock
+                .Setup(um => um.GetRolesAsync(It.Is<AuthUser>(u => u.Id == idProfile)))
+                .ReturnsAsync(new List<string> { "Администратор" });
+
+            userManagerMock
+                .Setup(um => um.GetUsersInRoleAsync(It.Is<string>(role => role == "Администратор")))
+                .ReturnsAsync(new List<AuthUser> { new AuthUser { UserName = userAuth.UserName, Email = userAuth.Email, Id = idProfile } });
+
+            userManagerMock
+                .Setup(um => um.GetRolesAsync(It.Is<AuthUser>(u => u.Id == new Guid("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"))))
+                .ReturnsAsync(new List<string> { "Куратор" });
+
+            userManagerMock
+                .Setup(um => um.DeleteAsync(It.IsAny<AuthUser>()))
+                .ReturnsAsync(IdentityResult.Success);
+
+            userManagerMock
+                .Setup(um => um.RemoveFromRoleAsync(It.IsAny<AuthUser>(), "Куратор"))
+                .ReturnsAsync(IdentityResult.Success);
+
+            userManagerMock
+                .Setup(um => um.AddToRoleAsync(It.IsAny<AuthUser>(), "Куратор"))
+                .ReturnsAsync(IdentityResult.Success);
+
+            var signInManager = new Mock<SignInManager<AuthUser>>(
+                userManagerMock.Object, Mock.Of<IHttpContextAccessor>(),
+                Mock.Of<IUserClaimsPrincipalFactory<AuthUser>>(), null, null, null, null);
+
+            signInManager
+                .Setup(s => s.CheckPasswordSignInAsync(It.IsAny<AuthUser>(), auth.Password, false))
+                .ReturnsAsync(Microsoft.AspNetCore.Identity.SignInResult.Failed);
+
+            var roleStoreMock = new Mock<IRoleStore<Role>>();
+
+            var mockRoleManager = new Mock<RoleManager<Role>>(
+                roleStoreMock.Object,
+                null,
+                null,
+                null,
+                null
+            );
+
+            userManagerMock
+                .Setup(um => um.GetRolesAsync(It.Is<AuthUser>(u => u.Id == idProfile)))
+                .ReturnsAsync(new List<string> { "Администратор" });
+
+            mockRoleManager.Setup(x => x.FindByIdAsync(It.Is<string>(id => id == "c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e")))
+                  .ReturnsAsync(new Role { Id = Guid.Parse("c9eb182b-1c3e-4c3b-8c3e-1c3e4c3b8c3e"), Name = "Куратор" });
+
+            mockRoleManager.Setup(x => x.FindByIdAsync(It.Is<string>(id => id == "f45d2396-3e72-4ec7-b892-7bd454248158")))
+                  .ReturnsAsync(new Role { Id = Guid.Parse("f45d2396-3e72-4ec7-b892-7bd454248158"), Name = "Администратор" });
+
+            var accountRepository = new AccountRepository(_context);
+
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, "admin@admin.com"),
+                new Claim(ClaimTypes.NameIdentifier, idProfile.ToString())
+            };
+
+            var identity = new ClaimsIdentity(claims);
+
+            var user = new ClaimsPrincipal(identity);
+
+            var mockHttpContext = new DefaultHttpContext() { User = user };
+
+            var controller = new AccountController(userManagerMock.Object, _tokenService, signInManager.Object, mockRoleManager.Object, _context, accountRepository)
+            {
+                ControllerContext = new ControllerContext
+                {
+                    HttpContext = mockHttpContext
+                }
+            };
+
+            var result = await controller.DeleteAccount(dto);
+
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<OkObjectResult>();
         }
     }
 }
