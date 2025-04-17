@@ -204,7 +204,7 @@ namespace Study1CApi.Controllers
 
                 var appUser = await _userManager.FindByIdAsync(updateUser.UserId.ToString());
 
-                if (appUser == null) return Unauthorized("There is no such user in the database!");
+                if (appUser == null) return BadRequest("There is no such user in the database!");
 
                 var httpUser = HttpContext.User;
                 var authUser = _userManager.FindByEmailAsync(httpUser.Identity.Name).Result;
