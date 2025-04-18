@@ -49,4 +49,5 @@
   
 ## Авторы 
  Чернов С.В. – Backend, Database, Testing –  https://github.com/RangPinck
+ 
  Горбачёв В.А. – Frontend, Database, Testing – https://github.com/Howaitoniksu
