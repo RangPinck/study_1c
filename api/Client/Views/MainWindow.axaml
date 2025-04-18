@@ -6,12 +6,10 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Client.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/image1.ico"
         Title="Client">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 	<SplitView IsPaneOpen="{Binding IsPaneOpen}" OpenPaneLength="500" Background="White" PanePlacement="Right" PaneBackground="White" DisplayMode="CompactInline" CornerRadius="15">
@@ -23,9 +21,7 @@
                   VerticalAlignment="Top">
 					<StackPanel Spacing="5" Margin="4,20,4,0" Orientation="Horizontal">
 					<Button Width="40" HorizontalAlignment="Right"  Background="White" Command="{Binding PaneState}">
-						
 						<Path Data="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" Fill="Black"/>
-						<!-- Hamburger Icon (SVG Path) -->
 					</Button>
 						</StackPanel>
 					<Border CornerRadius="5" Height="70" Background="White" Margin="4,20,4,0">
@@ -47,7 +43,6 @@
 						</StackPanel>
 						</Button>
 						</Border>
-					
 					
 					
 					<Border CornerRadius="5" Height="70" Background="White" Margin="4,0,4,0">
